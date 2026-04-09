@@ -30,15 +30,15 @@ export const metadata: Metadata = {
   },
   description: siteDescription,
   icons: {
-    icon: "/images/site-icon/icon.png",
-    apple: "/images/site-icon/icon.png",
+    icon: "/site-icon/site-icon.png",
+    apple: "/site-icon/site-icon.png",
   },
   openGraph: {
     title: siteName,
     description: siteDescription,
     images: [
       {
-        url: "/images/site-icon/icon.png",
+        url: "/site-icon/site-icon.png",
         width: 818,
         height: 1022,
         alt: siteName,
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: siteName,
     description: siteDescription,
-    images: ["/images/site-icon/icon.png"],
+    images: ["/site-icon/site-icon.png"],
   },
   appleWebApp: {
     capable: true,
