@@ -57,7 +57,7 @@ export default function HeroSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative min-h-[110svh] flex flex-col sm:flex-row sm:items-center overflow-x-clip pt-16">
+    <section ref={sectionRef} className="relative min-h-[110svh] flex flex-col sm:flex-row sm:items-center overflow-hidden pt-16">
       {/* Background motif - right side only */}
       <div className="absolute inset-0 bg-ivory" />
 
@@ -88,9 +88,6 @@ export default function HeroSection() {
           />
         </div>
       </div>
-
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-b from-transparent to-ivory z-10 pointer-events-none" />
 
       <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 w-full flex-1 flex flex-col sm:block sm:-mt-16 md:mt-0">
         <div className="max-w-2xl flex-1 flex flex-col py-10 sm:py-0 md:min-h-[72svh] md:justify-between md:gap-0 lg:min-h-0 lg:flex-none lg:justify-start lg:gap-24">
@@ -173,6 +170,20 @@ export default function HeroSection() {
 
         </div>
       </div>
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: "35vh",
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(245,240,232,0.15) 25%, rgba(245,240,232,0.5) 55%, rgba(245,240,232,0.9) 85%, #f5f0e8 100%)",
+          zIndex: 10,
+          pointerEvents: "none",
+        }}
+      />
     </section>
   );
 }

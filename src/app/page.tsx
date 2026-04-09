@@ -4,6 +4,7 @@ import FooterHatYazisi from "@/components/FooterHatYazisi";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import DedicationSection from "@/components/DedicationSection";
+import ImageCarousel from "@/components/ImageCarousel";
 import ProgramFinderSection from "@/components/ProgramFinderSection";
 import ProgramTurleriSection from "@/components/ProgramTurleriSection";
 import Footer from "@/components/Footer";
@@ -33,15 +34,17 @@ export default function Home() {
           />
         </div>
         <HeroSection />
-        <div className="bg-gradient-to-b from-ivory via-beige/30 to-beige/50">
+        <div className="bg-gradient-to-b from-[#f5f0e8] via-beige/30 to-beige/50">
           <ProgramTurleriSection showSubtitle={false} />
         </div>
 
         <div className="bg-gradient-to-b from-beige/50 via-beige/60 to-beige">
           <ProgramFinderSection />
         </div>
+        <div className="bg-beige">
+          <ImageCarousel />
+        </div>
         <div className="relative overflow-hidden bg-gradient-to-b from-beige via-beige/30 to-stone/40">
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-beige/75 via-beige/20 to-transparent" />
           <DedicationSection />
           <FooterHatYazisi />
         </div>

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { getSiteUrl, siteDescription, siteName } from "@/lib/site";
+import ClientBoot from "@/components/ClientBoot";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -63,100 +64,6 @@ export const metadata: Metadata = {
   },
 };
 
-const homeScrollResetScript = `
-(() => {
-  if (window.location.pathname !== "/") {
-    return;
-  }
-
-  const getNavigationType = () => {
-    const navigationEntry = window.performance
-      ?.getEntriesByType?.("navigation")?.[0];
-
-    if (navigationEntry && "type" in navigationEntry) {
-      return navigationEntry.type;
-    }
-
-    const legacyNavigation = window.performance?.navigation;
-
-    if (!legacyNavigation) {
-      return "navigate";
-    }
-
-    if (legacyNavigation.type === 1) {
-      return "reload";
-    }
-
-    if (legacyNavigation.type === 2) {
-      return "back_forward";
-    }
-
-    return "navigate";
-  };
-
-  if (getNavigationType() !== "reload") {
-    return;
-  }
-
-  const previousScrollRestoration = window.history.scrollRestoration;
-  const clearHash = () => {
-    if (!window.location.hash) {
-      return;
-    }
-
-    window.history.replaceState(
-      window.history.state,
-      "",
-      window.location.pathname + window.location.search
-    );
-  };
-
-  const resetScroll = () => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  };
-
-  const restoreScrollBehavior = () => {
-    window.history.scrollRestoration = previousScrollRestoration || "auto";
-  };
-
-  window.history.scrollRestoration = "manual";
-  clearHash();
-  resetScroll();
-
-  window.requestAnimationFrame(() => {
-    resetScroll();
-    window.setTimeout(resetScroll, 0);
-    window.setTimeout(resetScroll, 150);
-  });
-
-  window.addEventListener(
-    "pageshow",
-    () => {
-      resetScroll();
-      window.setTimeout(() => {
-        resetScroll();
-        restoreScrollBehavior();
-      }, 150);
-    },
-    { once: true }
-  );
-
-  window.addEventListener(
-    "load",
-    () => {
-      resetScroll();
-      window.setTimeout(() => {
-        resetScroll();
-        restoreScrollBehavior();
-      }, 150);
-    },
-    { once: true }
-  );
-})();
-`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -167,12 +74,8 @@ export default function RootLayout({
       lang="tr"
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{ __html: homeScrollResetScript }}
-        />
-      </head>
       <body className="min-h-full flex flex-col">
+        <ClientBoot />
         {children}
       </body>
     </html>

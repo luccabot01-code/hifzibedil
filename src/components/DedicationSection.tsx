@@ -11,8 +11,8 @@ const paragraphs = [
 
 export default function DedicationSection() {
   return (
-    <section className="pt-4 pb-12 sm:pt-6 sm:pb-20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="pt-10 pb-12 sm:pt-12 sm:pb-20">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal>
           <div className="relative bg-ivory rounded-2xl p-8 sm:p-12 border border-sand/60 shadow-sm overflow-hidden">
             <span className="absolute top-4 left-6 text-6xl text-sand font-serif select-none leading-none">
@@ -32,7 +32,7 @@ export default function DedicationSection() {
               </ScrollReveal>
             </blockquote>
 
-            <span className="absolute bottom-3 right-6 text-6xl text-sand font-serif select-none leading-none">
+            <span className="absolute -bottom-3 right-4 text-6xl text-sand font-serif select-none leading-none sm:bottom-3 sm:right-6">
               &rdquo;
             </span>
           </div>

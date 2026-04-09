@@ -38,7 +38,13 @@ yarn-error.log*
 
 # misc artifacts
 ${APPDATA}/
+.codex-dev.log
+.codex-dev.err
+.playwright-cli/
+*.TMP
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

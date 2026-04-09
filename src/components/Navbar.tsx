@@ -9,13 +9,14 @@ import type { MouseEvent } from "react";
 const menuItems = [
   { label: "Anasayfa", href: "/" },
   { label: "Hıfz-ı Bedîl Hakkında", href: "/nedir" },
+  { label: "Dr. Fatma Yasemin Mısırlı Kimdir?", href: "/dr-fatma-yasemin-misirli-kimdir" },
   { label: "Hıfz-ı Bedîl Kiti", href: "/kit" },
-  { label: "Takvim ve Ajanda", href: "/takvim-ajanda" },
-  { label: "Sıkça Sorulan Sorular", href: "/sss" },
+  { label: "SSS", href: "/sss" },
 ];
 
 const fullscreenMenuRoutes = [
   "/",
+  "/dr-fatma-yasemin-misirli-kimdir",
   "/nedir",
   "/sistemin-ayirt-edici-yonleri",
   "/nerelerde-uygulanabilir",
@@ -29,7 +30,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
   const isOpen = openPathname === pathname;
-  const isFullscreen = fullscreenMenuRoutes.includes(pathname);
+  const isFullscreen =
+    fullscreenMenuRoutes.includes(pathname) || pathname.startsWith("/program/");
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
