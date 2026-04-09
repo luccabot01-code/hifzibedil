@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { Swiper as SwiperType } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCoverflow } from "swiper/modules";
@@ -26,6 +26,18 @@ const eagerlyLoadedSlideCount = 3;
 
 export default function ImageCarousel() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const swiperRef = useRef<SwiperType | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const metricsRef = useRef({
+    inactiveBlur: 0,
+    nearBlur: 0,
+    inactiveScale: 0,
+    prevScale: 0,
+    nextScale: 0,
+    activeScale: 0,
+    inactiveOpacity: 0,
+    nearOpacity: 0,
+  });
   const [isNearViewport, setIsNearViewport] = useState(true);
 
   const mix = (from: number, to: number, progress: number) =>
@@ -36,7 +48,7 @@ export default function ImageCarousel() {
     return Number.isFinite(value) ? value : 0;
   };
 
-  const syncSlidePresentation = (swiper: SwiperType) => {
+  const refreshPresentationMetrics = () => {
     const sectionElement = sectionRef.current;
 
     if (!sectionElement) {
@@ -44,14 +56,29 @@ export default function ImageCarousel() {
     }
 
     const styles = window.getComputedStyle(sectionElement);
-    const inactiveBlur = getCssNumber(styles, "--inactive-blur");
-    const nearBlur = getCssNumber(styles, "--near-blur");
-    const inactiveScale = getCssNumber(styles, "--inactive-scale");
-    const prevScale = getCssNumber(styles, "--prev-scale");
-    const nextScale = getCssNumber(styles, "--next-scale");
-    const activeScale = getCssNumber(styles, "--active-scale");
-    const inactiveOpacity = getCssNumber(styles, "--inactive-opacity");
-    const nearOpacity = getCssNumber(styles, "--near-opacity");
+    metricsRef.current = {
+      inactiveBlur: getCssNumber(styles, "--inactive-blur"),
+      nearBlur: getCssNumber(styles, "--near-blur"),
+      inactiveScale: getCssNumber(styles, "--inactive-scale"),
+      prevScale: getCssNumber(styles, "--prev-scale"),
+      nextScale: getCssNumber(styles, "--next-scale"),
+      activeScale: getCssNumber(styles, "--active-scale"),
+      inactiveOpacity: getCssNumber(styles, "--inactive-opacity"),
+      nearOpacity: getCssNumber(styles, "--near-opacity"),
+    };
+  };
+
+  const syncSlidePresentation = (swiper: SwiperType) => {
+    const {
+      inactiveBlur,
+      nearBlur,
+      inactiveScale,
+      prevScale,
+      nextScale,
+      activeScale,
+      inactiveOpacity,
+      nearOpacity,
+    } = metricsRef.current;
 
     Array.from(swiper.slides).forEach((slideNode) => {
       const slideElement = slideNode as HTMLElement & { progress?: number };
@@ -81,6 +108,27 @@ export default function ImageCarousel() {
     });
   };
 
+  const scheduleSlidePresentationSync = (swiper: SwiperType) => {
+    swiperRef.current = swiper;
+
+    if (frameRef.current !== null) {
+      return;
+    }
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+      syncSlidePresentation(swiper);
+    });
+  };
+
+  const refreshAndSchedulePresentation = useEffectEvent(() => {
+    refreshPresentationMetrics();
+
+    if (swiperRef.current) {
+      scheduleSlidePresentationSync(swiperRef.current);
+    }
+  });
+
   useEffect(() => {
     const sectionElement = sectionRef.current;
 
@@ -96,9 +144,16 @@ export default function ImageCarousel() {
     );
 
     observer.observe(sectionElement);
+    refreshAndSchedulePresentation();
+    window.addEventListener("resize", refreshAndSchedulePresentation, { passive: true });
 
     return () => {
+      window.removeEventListener("resize", refreshAndSchedulePresentation);
       observer.disconnect();
+
+      if (frameRef.current !== null) {
+        window.cancelAnimationFrame(frameRef.current);
+      }
     };
   }, []);
 
@@ -553,12 +608,19 @@ export default function ImageCarousel() {
               modules={[EffectCoverflow]}
               effect="coverflow"
               onSwiper={(swiper) => {
-                requestAnimationFrame(() => {
-                  syncSlidePresentation(swiper);
-                });
+                refreshPresentationMetrics();
+                scheduleSlidePresentationSync(swiper);
               }}
               onProgress={(swiper) => {
-                syncSlidePresentation(swiper);
+                scheduleSlidePresentationSync(swiper);
+              }}
+              onResize={(swiper) => {
+                refreshPresentationMetrics();
+                scheduleSlidePresentationSync(swiper);
+              }}
+              onBreakpoint={(swiper) => {
+                refreshPresentationMetrics();
+                scheduleSlidePresentationSync(swiper);
               }}
               initialSlide={0}
               centeredSlides={true}
