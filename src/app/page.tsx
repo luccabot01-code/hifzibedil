@@ -9,13 +9,37 @@ import ProgramFinderSection from "@/components/ProgramFinderSection";
 import ProgramTurleriSection from "@/components/ProgramTurleriSection";
 import Footer from "@/components/Footer";
 import ContributorsMarquee from "@/components/ContributorsMarquee";
-import { siteDescription } from "@/lib/site";
+import {
+  siteName,
+  sitePreviewDescription,
+} from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Hıfz-ı Bedîl",
+    absolute: siteName,
   },
-  description: siteDescription,
+  description: sitePreviewDescription,
+  openGraph: {
+    title: siteName,
+    description: sitePreviewDescription,
+    images: [
+      {
+        url: "/site-icon/site-icon.png",
+        width: 818,
+        height: 1022,
+        alt: siteName,
+      },
+    ],
+    type: "website",
+    locale: "tr_TR",
+    siteName,
+  },
+  twitter: {
+    card: "summary",
+    title: siteName,
+    description: sitePreviewDescription,
+    images: ["/site-icon/site-icon.png"],
+  },
 };
 
 export default function Home() {

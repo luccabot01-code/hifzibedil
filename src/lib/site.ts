@@ -5,6 +5,8 @@ export const siteUrl = "https://www.hifzibedil.com";
 export const siteDescription =
   "Hıfz-ı Bedîl, Kur'ân-ı Kerîm ezberine alternatif bir yaklaşım sunan, sıralı ezber ve periyodik tekrar esasına göre tasarlanmış bir hafızlık programıdır.";
 
+export const sitePreviewDescription = "Ezberde Temekkün\nTekrarda Sebat";
+
 export function getSiteUrl() {
   const candidate =
     process.env.NEXT_PUBLIC_SITE_URL ??
