@@ -68,6 +68,8 @@ export default function ImageCarousel() {
     };
   };
 
+  const prevValuesRef = useRef<Map<HTMLElement, string>>(new Map());
+
   const syncSlidePresentation = (swiper: SwiperType) => {
     const {
       inactiveBlur,
@@ -80,16 +82,32 @@ export default function ImageCarousel() {
       nearOpacity,
     } = metricsRef.current;
 
-    Array.from(swiper.slides).forEach((slideNode) => {
-      const slideElement = slideNode as HTMLElement & { progress?: number };
+    const slides = swiper.slides;
+    const activeIndex = swiper.activeIndex;
+    const prevValues = prevValuesRef.current;
+
+    for (let i = 0; i < slides.length; i++) {
+      const slideElement = slides[i] as HTMLElement & { progress?: number };
       const slideProgress = slideElement.progress ?? 0;
       const absoluteProgress = Math.min(Math.abs(slideProgress), 2);
+
+      // Skip slides far from active - they won't be visually changing
+      if (Math.abs(i - activeIndex) > 3) {
+        const key = `${inactiveBlur}|${inactiveScale}|${inactiveOpacity}`;
+        if (prevValues.get(slideElement) === key) continue;
+        prevValues.set(slideElement, key);
+        slideElement.style.setProperty("--card-blur-live", `${inactiveBlur}px`);
+        slideElement.style.setProperty("--card-scale-live", String(inactiveScale));
+        slideElement.style.setProperty("--card-opacity-live", String(inactiveOpacity));
+        continue;
+      }
+
       const isNextSlide = slideProgress > 0;
       const nearScale = isNextSlide ? nextScale : prevScale;
 
-      let blur = inactiveBlur;
-      let scale = inactiveScale;
-      let opacity = inactiveOpacity;
+      let blur: number;
+      let scale: number;
+      let opacity: number;
 
       if (absoluteProgress <= 1) {
         blur = mix(0, nearBlur, absoluteProgress);
@@ -102,10 +120,19 @@ export default function ImageCarousel() {
         opacity = mix(nearOpacity, inactiveOpacity, outerProgress);
       }
 
-      slideElement.style.setProperty("--card-blur-live", `${blur.toFixed(3)}px`);
-      slideElement.style.setProperty("--card-scale-live", scale.toFixed(4));
-      slideElement.style.setProperty("--card-opacity-live", opacity.toFixed(4));
-    });
+      // Round to reduce style recalcs for tiny changes
+      const blurR = Math.round(blur * 100) / 100;
+      const scaleR = Math.round(scale * 1000) / 1000;
+      const opacityR = Math.round(opacity * 1000) / 1000;
+
+      const key = `${blurR}|${scaleR}|${opacityR}`;
+      if (prevValues.get(slideElement) === key) continue;
+      prevValues.set(slideElement, key);
+
+      slideElement.style.setProperty("--card-blur-live", `${blurR}px`);
+      slideElement.style.setProperty("--card-scale-live", String(scaleR));
+      slideElement.style.setProperty("--card-opacity-live", String(opacityR));
+    }
   };
 
   const scheduleSlidePresentationSync = (swiper: SwiperType) => {
@@ -163,9 +190,9 @@ export default function ImageCarousel() {
       className={`image-carousel py-10 sm:py-12${isNearViewport ? " is-near-viewport" : ""}`}
       style={{
         maskImage:
-          "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+          "linear-gradient(to bottom, transparent 0%, black 15%, black 94%, transparent 100%)",
         WebkitMaskImage:
-          "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+          "linear-gradient(to bottom, transparent 0%, black 15%, black 94%, transparent 100%)",
       }}
     >
       <style
@@ -293,9 +320,9 @@ export default function ImageCarousel() {
                 rgba(246, 240, 233, 0.84) 8%,
                 rgba(246, 240, 233, 0.2) 16%,
                 rgba(246, 240, 233, 0) 24%,
-                rgba(246, 240, 233, 0) 76%,
-                rgba(226, 208, 191, 0.18) 84%,
-                rgba(226, 208, 191, 0.74) 92%,
+                rgba(246, 240, 233, 0) 84%,
+                rgba(226, 208, 191, 0.18) 90%,
+                rgba(226, 208, 191, 0.74) 96%,
                 rgba(226, 208, 191, 0.96) 100%
               );
             }
@@ -345,23 +372,23 @@ export default function ImageCarousel() {
 
             /* === INACTIVE cards (all slides by default) === */
             .image-carousel .swiper-slide .carousel-card {
-              transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                          filter 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                          opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                          box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+              transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                          opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+                          box-shadow 0.38s cubic-bezier(0.22, 1, 0.36, 1);
               filter: blur(var(--card-blur-live));
               opacity: var(--card-opacity-live);
-              transform: translateZ(0) scale(var(--card-scale-live));
+              transform: translate3d(0,0,0) scale(var(--card-scale-live));
               transform-origin: center center;
               backface-visibility: hidden;
               -webkit-backface-visibility: hidden;
               isolation: isolate;
+              contain: layout style paint;
             }
 
             .image-carousel .swiper-slide-prev .carousel-card,
             .image-carousel .swiper-slide-next .carousel-card,
             .image-carousel .swiper-slide-active .carousel-card {
-              will-change: transform, opacity, filter;
+              will-change: transform, opacity;
             }
 
             .image-carousel .carousel-card::before {
@@ -437,10 +464,9 @@ export default function ImageCarousel() {
 
               .image-carousel .swiper-slide .carousel-card {
                 transition:
-                  transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-                  opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-                  filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-                  box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+                  transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
               }
 
               .image-carousel .swiper-slide-active .carousel-card {
@@ -485,10 +511,9 @@ export default function ImageCarousel() {
               }
 
               .image-carousel .swiper-slide .carousel-card {
-                transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-                            filter 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-                            opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-                            box-shadow 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+                transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                            opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+                            box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
               }
 
               .image-carousel .carousel-backdrop-art {
@@ -640,7 +665,7 @@ export default function ImageCarousel() {
               threshold={2}
               longSwipesRatio={0.28}
               longSwipesMs={220}
-              speed={440}
+              speed={380}
               spaceBetween={10}
               coverflowEffect={{
                 rotate: 0,
@@ -652,7 +677,7 @@ export default function ImageCarousel() {
               }}
               breakpoints={{
                 640: {
-                  speed: 500,
+                  speed: 420,
                   spaceBetween: 14,
                   coverflowEffect: {
                     rotate: 0,
@@ -664,7 +689,7 @@ export default function ImageCarousel() {
                   },
                 },
                 768: {
-                  speed: 560,
+                  speed: 480,
                   spaceBetween: 18,
                   coverflowEffect: {
                     rotate: 0,
@@ -676,7 +701,7 @@ export default function ImageCarousel() {
                   },
                 },
                 1024: {
-                  speed: 650,
+                  speed: 550,
                   spaceBetween: 28,
                   coverflowEffect: {
                     rotate: 0,

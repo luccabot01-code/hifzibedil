@@ -5,11 +5,11 @@ import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const contributors = [
-  { src: "/yeniklasor/darusselam.png", alt: "Darüsselam", dark: true, className: "h-10 sm:h-12" },
-  { src: "/yeniklasor/fatihbelediyesi.png", alt: "Fatih Belediyesi", dark: false, className: "h-12 sm:h-16" },
-  { src: "/yeniklasor/onenuqta.png", alt: "One Nuqta", dark: false, className: "h-12 sm:h-16" },
-  { src: "/yeniklasor/istanbul-kutu-logo-siyah.png", alt: "İstanbul Kutu", dark: true, className: "h-4 sm:h-6" },
-  { src: "/yeniklasor/arabic.png", alt: "Arabic Logo", dark: false, className: "translate-y-1 h-16 sm:translate-y-1 sm:h-24" },
+  { src: "/yeniklasor/darusselam.png", alt: "Darüsselam", className: "h-10 sm:h-12" },
+  { src: "/yeniklasor/fatihbelediyesi.png", alt: "Fatih Belediyesi", className: "h-12 sm:h-16" },
+  { src: "/yeniklasor/onenuqta.png", alt: "One Nuqta", className: "h-12 sm:h-16" },
+  { src: "/yeniklasor/istanbul-kutu-logo-siyah.png", alt: "İstanbul Kutu", className: "h-4 sm:h-6" },
+  { src: "/yeniklasor/arabic.png", alt: "Arabic Logo", className: "translate-y-1 h-16 sm:translate-y-1 sm:h-24" },
 ];
 
 const SPEED = 40; // pixels per second
@@ -23,7 +23,7 @@ function LogoGroup({ groupIndex }: { groupIndex: number }) {
       {contributors.map((c) => (
         <div
           key={`${c.alt}-${groupIndex}`}
-          className={`flex-shrink-0 ${c.className ?? "h-8 sm:h-10"} w-auto opacity-90 hover:opacity-100 transition-opacity ${c.dark ? "brightness-0" : ""}`}
+          className={`flex-shrink-0 ${c.className ?? "h-8 sm:h-10"} w-auto brightness-0`}
         >
           <Image
             src={c.src}
@@ -31,6 +31,7 @@ function LogoGroup({ groupIndex }: { groupIndex: number }) {
             width={120}
             height={40}
             sizes="120px"
+            loading="eager"
             draggable={false}
             className="h-full w-auto object-contain pointer-events-none"
             style={{ height: "100%", width: "auto" }}
