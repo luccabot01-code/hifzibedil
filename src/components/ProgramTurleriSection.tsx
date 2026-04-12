@@ -90,18 +90,36 @@ function AnimatedCard({
       <button
         type="button"
         onClick={() => onIncele(`/program/${p.year}yil`)}
-        className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-5 md:right-5 inline-flex items-center justify-center px-4 py-1.5 sm:px-6 sm:py-2.5 md:px-8 md:py-3 rounded-lg md:rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 cursor-pointer"
+        className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-5 md:right-5 inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide cursor-pointer group/btn"
         style={{
-          backgroundColor: p.hex,
+          backgroundColor: `color-mix(in srgb, ${p.hex} 85%, white)`,
           color: "#2C2C2C",
           zIndex: 1,
           opacity: revealed ? 1 : 0,
           transform: revealed ? "translateY(0)" : "translateY(10px)",
-          transition: `opacity 0.6s ease ${index * 80 + 400}ms, transform 0.6s ease ${index * 80 + 400}ms`,
+          transition: `opacity 0.6s ease ${index * 80 + 400}ms, transform 0.6s ease ${index * 80 + 400}ms, background-color 0.3s ease, box-shadow 0.3s ease`,
+          boxShadow: `0 2px 12px ${p.hex}44, 0 1px 3px rgba(0,0,0,0.08)`,
+          backdropFilter: "blur(12px) saturate(1.4)",
+          WebkitBackdropFilter: "blur(12px) saturate(1.4)",
+          border: `1px solid ${p.hex}33`,
         }}
       >
         İncele
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-1.5 sm:ml-2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="transition-transform duration-300 group-hover/btn:translate-x-0.5"
+        >
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
       </button>
     </div>
   );

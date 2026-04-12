@@ -1,4 +1,5 @@
-import { ExternalLink, HelpCircle } from "lucide-react";
+import { ArrowRight, HelpCircle } from "lucide-react";
+import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default function ProgramFinderSection() {
@@ -29,15 +30,13 @@ export default function ProgramFinderSection() {
             </ScrollReveal>
 
             <ScrollReveal delay={550}>
-              <a
-                href="https://form.typeform.com/to/S7zBWGFX?fbclid=PAdGRleAQ7n0dleHRuA2FlbQIxMQBzcnRjBmFwcF9pZA8xMjQwMjQ1NzQyODc0MTQAAacWqvCmXjgcbPvjXFhiqaZ4YE7nNxgKQDSAyWXH023TiCQKj3ND4Io0kE6r0Q_aem_uM1XjnT74bkZfbPiQ7c23w&typeform-source=l.instagram.com&utm_source=ig&utm_medium=social&utm_content=link_in_bio"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-[#A7A096] text-ivory rounded-xl font-medium text-lg hover:bg-[#958d83] transition-colors duration-200 shadow-lg hover:shadow-xl"
+              <Link
+                href="/program-bul"
+                className="group inline-flex items-center gap-2 px-8 py-4 bg-[#A7A096] text-ivory rounded-xl font-medium text-lg hover:bg-[#958d83] transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 Programımı Bul
-                <ExternalLink className="w-5 h-5" />
-              </a>
+                <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
             </ScrollReveal>
           </div>
         </ScrollReveal>

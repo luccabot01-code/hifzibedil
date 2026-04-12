@@ -160,7 +160,7 @@ export default function HeroSection() {
                 Program Türleri
               </a>
               <a
-                href="#program-finder"
+                href="/program-bul"
                 className="inline-flex flex-1 items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 border-2 border-earth/30 text-earth rounded-xl text-[13px] sm:text-base font-medium text-center leading-snug hover:bg-earth/5 active:scale-95 transition-all duration-200"
               >
                 Programımı Bul

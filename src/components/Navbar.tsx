@@ -23,6 +23,7 @@ const fullscreenMenuRoutes = [
   "/kit",
   "/takvim-ajanda",
   "/sss",
+  "/program-bul",
 ];
 
 export default function Navbar() {
