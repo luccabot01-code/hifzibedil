@@ -49,12 +49,12 @@ const programData: Record<
       "2 yıllık program, yoğun tempoda çalışarak kısa sürede hıfzını tamamlamak isteyenler için uygundur. Güçlü bir ezber kabiliyeti ve yüksek motivasyon gerektirir.",
   },
   "1yil": {
-    label: "1 Yıllık Program",
+    label: "1 Yıllık Has Programı",
     hex: "#E8CCB2",
     folder: "1year",
     backgroundLogoSrc: "/yeniklasor/1yil.png",
     description:
-      "1 yıllık program, en yoğun tempoda ilerleyen ve hıfzını en kısa sürede tamamlamak isteyenler için tasarlanmıştır. Çok güçlü bir ezber kabiliyeti ve tam zamanlı adanmışlık gerektirir.",
+      "1 yıllık Has programı, en yoğun tempoda ilerleyen ve hıfzını en kısa sürede tamamlamak isteyenler için tasarlanmıştır. Çok güçlü bir ezber kabiliyeti ve tam zamanlı adanmışlık gerektirir.",
   },
 };
 

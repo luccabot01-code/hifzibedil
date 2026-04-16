@@ -7,7 +7,6 @@ import { EffectCoverflow } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import Image from "next/image";
-
 const images = [
   { src: "/yeni-klasor2/1.JPG", alt: "Slide 1" },
   { src: "/yeni-klasor2/2.JPG", alt: "Slide 2" },
@@ -39,6 +38,7 @@ export default function ImageCarousel() {
     nearOpacity: 0,
   });
   const [isNearViewport, setIsNearViewport] = useState(true);
+  const [hasRevealed, setHasRevealed] = useState(false);
 
   const mix = (from: number, to: number, progress: number) =>
     from + (to - from) * progress;
@@ -170,13 +170,25 @@ export default function ImageCarousel() {
       { rootMargin: "240px 0px" }
     );
 
+    const revealObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setHasRevealed(true);
+          revealObserver.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
     observer.observe(sectionElement);
+    revealObserver.observe(sectionElement);
     refreshAndSchedulePresentation();
     window.addEventListener("resize", refreshAndSchedulePresentation, { passive: true });
 
     return () => {
       window.removeEventListener("resize", refreshAndSchedulePresentation);
       observer.disconnect();
+      revealObserver.disconnect();
 
       if (frameRef.current !== null) {
         window.cancelAnimationFrame(frameRef.current);
@@ -187,7 +199,7 @@ export default function ImageCarousel() {
   return (
     <section
       ref={sectionRef}
-      className={`image-carousel py-10 sm:py-12${isNearViewport ? " is-near-viewport" : ""}`}
+      className={`image-carousel py-10 sm:py-12${isNearViewport ? " is-near-viewport" : ""}${hasRevealed ? " cards-revealed" : ""}`}
       style={{
         maskImage:
           "linear-gradient(to bottom, transparent 0%, black 15%, black 94%, transparent 100%)",
@@ -565,7 +577,101 @@ export default function ImageCarousel() {
                 animation: none !important;
                 transition-duration: 0.01ms;
               }
+              .image-carousel .carousel-slide {
+                opacity: 1 !important;
+                transform: none !important;
+              }
             }
+
+            /* === Card entrance animations === */
+            @keyframes cardFromLeft {
+              from {
+                opacity: 0;
+                transform: translate3d(-80px, 30px, 0) scale(0.3) rotate(-3deg);
+              }
+              to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+              }
+            }
+
+            @keyframes cardFromRight {
+              from {
+                opacity: 0;
+                transform: translate3d(80px, 30px, 0) scale(0.3) rotate(3deg);
+              }
+              to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+              }
+            }
+
+            @keyframes cardFromTop {
+              from {
+                opacity: 0;
+                transform: translate3d(0, -70px, 0) scale(0.3);
+              }
+              to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+              }
+            }
+
+            @keyframes cardFromBottom {
+              from {
+                opacity: 0;
+                transform: translate3d(0, 70px, 0) scale(0.3);
+              }
+              to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+              }
+            }
+
+            .image-carousel .carousel-slide {
+              opacity: 0;
+            }
+
+            .image-carousel.cards-revealed .carousel-slide {
+              animation-duration: 1.8s;
+              animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+              animation-fill-mode: forwards;
+            }
+
+            /* Fan pattern: outer cards from sides, inner from top/bottom */
+            .image-carousel.cards-revealed .carousel-slide:nth-child(1) {
+              animation-name: cardFromLeft;
+              animation-delay: 0ms;
+            }
+            .image-carousel.cards-revealed .carousel-slide:nth-child(2) {
+              animation-name: cardFromBottom;
+              animation-delay: 180ms;
+            }
+            .image-carousel.cards-revealed .carousel-slide:nth-child(3) {
+              animation-name: cardFromTop;
+              animation-delay: 360ms;
+            }
+            .image-carousel.cards-revealed .carousel-slide:nth-child(4) {
+              animation-name: cardFromRight;
+              animation-delay: 540ms;
+            }
+            .image-carousel.cards-revealed .carousel-slide:nth-child(5) {
+              animation-name: cardFromBottom;
+              animation-delay: 720ms;
+            }
+            .image-carousel.cards-revealed .carousel-slide:nth-child(6) {
+              animation-name: cardFromLeft;
+              animation-delay: 900ms;
+            }
+            .image-carousel.cards-revealed .carousel-slide:nth-child(7) {
+              animation-name: cardFromTop;
+              animation-delay: 1080ms;
+            }
+            .image-carousel.cards-revealed .carousel-slide:nth-child(8) {
+              animation-name: cardFromRight;
+              animation-delay: 1260ms;
+            }
+
           `,
         }}
       />

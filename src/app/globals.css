@@ -153,6 +153,35 @@ section:not(.product-section):not(.image-carousel) {
   50% { opacity: 0; }
 }
 
+@keyframes navbar-liquid-drift {
+  0% {
+    transform: translate3d(-12%, -8%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(10%, 12%, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-12%, -8%, 0) scale(1);
+  }
+}
+
+@keyframes navbar-liquid-sheen {
+  0% {
+    transform: translateX(-35%) skewX(-18deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateX(165%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
 .cursor-blink {
   display: inline-block;
   width: 1.5px;

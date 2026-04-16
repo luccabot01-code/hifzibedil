@@ -6,9 +6,9 @@ export default function ProgramFinderSection() {
   return (
     <section id="program-finder" className="scroll-mt-24 py-10 sm:py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <ScrollReveal>
+        <ScrollReveal duration={800} distance={32}>
           <div className="relative bg-gradient-to-br from-earth/5 to-sand/40 rounded-3xl p-10 sm:p-14 border border-sand/50 text-center overflow-hidden">
-            <ScrollReveal delay={100}>
+            <ScrollReveal delay={100} distance={24} duration={800}>
               <div className="flex justify-center mb-6">
                 <div className="w-16 h-16 rounded-full bg-[#A7A096] flex items-center justify-center">
                   <HelpCircle className="w-8 h-8 text-ivory" />
@@ -16,20 +16,20 @@ export default function ProgramFinderSection() {
               </div>
             </ScrollReveal>
 
-            <ScrollReveal delay={250}>
+            <ScrollReveal delay={200} distance={24} duration={800}>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold text-dark mb-4">
                 Benim İçin En Uygun Hıfz-ı Bedîl Programı Hangisidir?
               </h2>
             </ScrollReveal>
 
-            <ScrollReveal delay={400}>
+            <ScrollReveal delay={300} distance={24} duration={800}>
               <p className="text-earth mb-8 max-w-xl mx-auto">
                 Size en uygun programı belirlemek için kısa anketimizi
                 doldurun.
               </p>
             </ScrollReveal>
 
-            <ScrollReveal delay={550}>
+            <ScrollReveal delay={400} distance={24} duration={800}>
               <Link
                 href="/program-bul"
                 className="group inline-flex items-center gap-2 px-8 py-4 bg-[#A7A096] text-ivory rounded-xl font-medium text-lg hover:bg-[#958d83] transition-all duration-200 shadow-lg hover:shadow-xl"

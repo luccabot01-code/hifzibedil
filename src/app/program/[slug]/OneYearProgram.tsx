@@ -467,7 +467,7 @@ function ProductShowcase() {
 
   return (
     <section className="product-section">
-      <SectionTitle>1 Yıllık Program Kiti</SectionTitle>
+      <SectionTitle>1 Yıllık Has Programı Kiti</SectionTitle>
 
       <div aria-hidden className="absolute w-0 h-0 overflow-hidden">
         {products.map((p) => (

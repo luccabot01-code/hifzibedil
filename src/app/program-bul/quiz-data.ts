@@ -72,7 +72,7 @@ export const STEPS: Record<string, QuizStep> = {
       },
       {
         label:
-          "Temel Kur'ân-ı Kerîm bilgisi ve tecvîd ahkâmım zayıf veya hiç yok. Tamamen hatasız bir okuyuşum yok veya yeni başlıyorum.",
+          "Temel Kur'ân-ı Kerîm bilgisi ve tecvîd ahkâmım zayıf veya hiç yok. Hatasız okuduğumu söyleyemem, yeni başlıyorum.",
         value: "zayif",
         nextStep: "no-program",
       },

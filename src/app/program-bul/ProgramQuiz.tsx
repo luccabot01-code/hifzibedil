@@ -239,6 +239,9 @@ function BodyTextBlock({ text }: { text: string }) {
   );
 }
 
+const EVALUATION_NOTE =
+  "Hıfz-ı Bedîl Ekibi olarak bizler, sizin paylaştığınız bilgiler, işin ehli hocalarımız tarafından verilen tavsiyeler ve geçmiş aday deneyimlerinden edindiğimiz tecrübeler doğrultusunda naçizane bir değerlendirme sunmaktayız. Elbette kişi kendisini en iyi tanıyandır; bu nedenle kendi hayat düzeninizi, zamanınızı ve kabiliyetinizi göz önünde bulundurarak diğer program türlerini de inceleyip nihai kararı sizin vermeniz doğru bir yaklaşım olacaktır. Sevgi ve dua ile.";
+
 // ─── Main quiz component ────────────────────────────────────────────
 export default function ProgramQuiz() {
   const [currentStep, setCurrentStep] = useState("level");
@@ -426,10 +429,7 @@ export default function ProgramQuiz() {
                 </div>
 
                 <p className="text-earth/50 text-xs sm:text-sm leading-relaxed mt-8 text-center italic">
-                  Bu değerlendirme, paylaştığınız bilgiler doğrultusunda
-                  naçizane bir yönlendirmedir. Kişi kendisini en iyi
-                  tanıyandır. Hayat düzeninizi, zamanınızı ve kabiliyetinizi
-                  göz önünde bulundurarak nihai kararı siz verin.
+                  {EVALUATION_NOTE}
                 </p>
 
                 <div className="text-center mt-8">
@@ -492,10 +492,7 @@ export default function ProgramQuiz() {
                 )}
 
                 <p className="text-earth/50 text-xs sm:text-sm leading-relaxed mt-6 text-center italic">
-                  Bu değerlendirme, paylaştığınız bilgiler doğrultusunda
-                  naçizane bir yönlendirmedir. Kişi kendisini en iyi
-                  tanıyandır. Hayat düzeninizi, zamanınızı ve kabiliyetinizi
-                  göz önünde bulundurarak nihai kararı siz verin.
+                  {EVALUATION_NOTE}
                 </p>
 
                 <div className="text-center mt-8">
