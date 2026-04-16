@@ -1,11 +1,12 @@
 {
-  "projectId": "b9cdbcb1-b20f-497a-887e-a8cab6d94eae",
-  "createdAt": 1775309986950,
+  "projectId": "202fa5f0-da53-4cf5-aaf5-073071741ac8",
+  "createdAt": 1776335719012,
   "version": "1.0",
   "startupCommands": [
     "npm install; npm run dev"
   ],
+  "previewUrl": "http://localhost:3000",
   "templateId": "any",
-  "vercelProjectId": "prj_4wio5IE2ZVkf3de9qJpPCW84pdta",
+  "vercelProjectId": "prj_dkG51WkVMW5lME8G3KBLSdMkG9Hj",
   "deployedWithUserToken": false
 }

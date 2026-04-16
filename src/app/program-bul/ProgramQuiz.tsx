@@ -31,6 +31,7 @@ function StepTransition({ children }: { children: React.ReactNode }) {
         transition: visible
           ? "opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1)"
           : "none",
+        willChange: "transform, opacity",
       }}
     >
       {children}
@@ -58,21 +59,19 @@ function OptionCard({
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left rounded-xl border cursor-pointer hover:border-[#A7A096]/50 hover:shadow-md active:scale-[0.98]"
+      className="w-full text-left rounded-xl cursor-pointer sm:hover:shadow-md active:scale-[0.98]"
       style={{
         padding: "14px 18px",
-        borderColor: selected
-          ? "#A7A096"
-          : "rgba(167,160,150,0.25)",
+        border: `1px solid ${selected ? "#A7A096" : "rgba(167,160,150,0.25)"}`,
         backgroundColor: selected
           ? "rgba(167,160,150,0.15)"
           : "#FDFCFA",
         boxShadow: selected
           ? "0 4px 16px rgba(167,160,150,0.3), 0 0 0 2px rgba(167,160,150,0.2)"
-          : "0 1px 3px rgba(0,0,0,0.04)",
+          : "none",
         transform: selected ? "scale(1.02)" : dimmed ? "scale(0.97)" : "scale(1)",
         opacity: dimmed ? 0.4 : 1,
-        transition: "all 0.35s cubic-bezier(0.16,1,0.3,1)",
+        transition: "transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s cubic-bezier(0.16,1,0.3,1), background-color 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s cubic-bezier(0.16,1,0.3,1)",
       }}
     >
       <div className="flex items-start gap-3">
@@ -304,7 +303,7 @@ export default function ProgramQuiz() {
   const bodyText = bodyKey ? BODY_TEXTS[bodyKey] : null;
 
   return (
-    <div className="relative min-h-svh bg-ivory overflow-hidden">
+    <div className="relative min-h-svh bg-ivory overflow-clip">
       {/* Background logo — mobile: right-bottom, desktop: right-center */}
       <div className="absolute right-0 z-[1] pointer-events-none translate-x-[43%] bottom-0 translate-y-[30%] sm:bottom-auto sm:translate-y-[-5%] sm:inset-y-0 sm:flex sm:items-center">
         <div

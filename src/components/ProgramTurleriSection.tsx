@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -15,92 +16,74 @@ const programs = [
   { year: "1", label: "1 Yıllık Program", image: "/yeniklasor/1yillik.png", hex: "#E8CCB2" },
 ];
 
-function AnimatedCard({
-  p,
-  index,
-  onIncele,
-}: {
-  p: (typeof programs)[number];
-  index: number;
-  onIncele: (href: string) => void;
-}) {
-  return (
-    <ScrollReveal delay={index * 100} distance={24} duration={800}>
-      <div
-        className="relative rounded-2xl shadow-lg select-none group"
-        onContextMenu={(e) => e.preventDefault()}
-        style={{ backgroundColor: "transparent" }}
-      >
-        <div
-          className="relative rounded-2xl overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(77, 61, 45, 0.72) 0%, rgba(92, 72, 53, 0.42) 12%, rgba(92, 72, 53, 0.42) 88%, rgba(77, 61, 45, 0.72) 100%)",
-          }}
-        >
-          <Image
-            src={p.image}
-            alt={p.label}
-            width={1600}
-            height={800}
-            sizes="(max-width: 640px) 95vw, (max-width: 1024px) 80vw, 768px"
-            draggable={false}
-            className="w-full h-auto block pointer-events-none"
-            style={{
-              borderRadius: "inherit",
-              maskImage:
-                "linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0%, black 12%, black 88%, rgba(0, 0, 0, 0.18) 100%)",
-              WebkitMaskImage:
-                "linear-gradient(to bottom, rgba(0, 0, 0, 0.18) 0%, black 12%, black 88%, rgba(0, 0, 0, 0.18) 100%)",
-            }}
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => onIncele(`/program/${p.year}yil`)}
-          className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-5 md:right-5 inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide cursor-pointer group/btn"
-          style={{
-            backgroundColor: `color-mix(in srgb, ${p.hex} 85%, white)`,
-            color: "#2C2C2C",
-            zIndex: 1,
-            boxShadow: `0 2px 12px ${p.hex}44, 0 1px 3px rgba(0,0,0,0.08)`,
-            backdropFilter: "blur(12px) saturate(1.4)",
-            WebkitBackdropFilter: "blur(12px) saturate(1.4)",
-            border: `1px solid ${p.hex}33`,
-            transition: "background-color 0.3s ease, box-shadow 0.3s ease",
-          }}
-        >
-          İncele
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="transition-transform duration-300 group-hover/btn:translate-x-0.5"
-          >
-            <path d="M5 12h14" />
-            <path d="m12 5 7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-    </ScrollReveal>
-  );
-}
+/* Navbar clearance + per-card offset so peeking edges stay visible */
+const STICKY_TOP = 76;
+const STACK_GAP = 18;
 
 export default function ProgramTurleriSection({
   headingLevel = "h2",
   showSubtitle = true,
 }: ProgramTurleriSectionProps) {
   const Heading = headingLevel;
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleIncele = (href: string) => {
     window.location.href = href;
   };
+
+  /* Animate scale + brightness based on cumulative depth (how many cards sit on top) */
+  const onScroll = useCallback(() => {
+    const cards = cardsRef.current;
+    const total = cards.length;
+
+    /* Step 1 — calculate per-pair overlap progress (0 → 1) */
+    const overlaps: number[] = [];
+    for (let i = 0; i < total - 1; i++) {
+      const card = cards[i];
+      const nextCard = cards[i + 1];
+      if (!card || !nextCard) { overlaps.push(0); continue; }
+
+      const cardRect = card.getBoundingClientRect();
+      const nextRect = nextCard.getBoundingClientRect();
+      const overlap = cardRect.top + cardRect.height - nextRect.top;
+      const maxOverlap = cardRect.height;
+      const raw = overlap > 0 ? Math.min(overlap / maxOverlap, 1) : 0;
+      overlaps.push(1 - Math.pow(1 - raw, 2)); // ease-out
+    }
+
+    /* Step 2 — apply cumulative depth-based styling */
+    for (let i = 0; i < total - 1; i++) {
+      const inner = cards[i]?.querySelector<HTMLElement>("[data-card-inner]");
+      if (!inner) continue;
+
+      const gradient = inner.querySelector<HTMLElement>("[data-card-gradient]");
+
+      /* depth = sum of all overlap progresses from this card onwards */
+      let depth = 0;
+      for (let j = i; j < total - 1; j++) depth += overlaps[j];
+
+      if (depth > 0) {
+        const scale = 1 - depth * 0.055;
+        const brightness = 1 - depth * 0.07;
+        inner.style.transform = `scale(${Math.max(scale, 0.78)})`;
+        inner.style.opacity = "1";
+        inner.style.filter = `brightness(${Math.max(brightness, 0.65)})`;
+        /* Fade gradient progressively — fully gone when depth reaches max (3) */
+        if (gradient) gradient.style.opacity = `${Math.max(1 - depth * 0.35, 0)}`;
+      } else {
+        inner.style.transform = "scale(1)";
+        inner.style.opacity = "1";
+        inner.style.filter = "brightness(1)";
+        if (gradient) gradient.style.opacity = "1";
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [onScroll]);
 
   return (
     <section id="programs" className="relative bg-transparent pb-10 sm:pb-12">
@@ -125,14 +108,84 @@ export default function ProgramTurleriSection({
           </div>
         </ScrollReveal>
 
-        <div className="max-w-5xl mx-auto flex flex-col gap-5">
+        {/* Sticky stacking cards */}
+        <div className="max-w-5xl mx-auto">
           {programs.map((p, i) => (
-            <AnimatedCard
+            <div
               key={p.year}
-              p={p}
-              index={i}
-              onIncele={handleIncele}
-            />
+              ref={(el) => {
+                cardsRef.current[i] = el;
+              }}
+              className="sticky"
+              style={{
+                top: `${STICKY_TOP + i * STACK_GAP}px`,
+                zIndex: i + 1,
+                marginBottom: i < programs.length - 1 ? 20 : 0,
+              }}
+            >
+              <div
+                data-card-inner
+                className="relative rounded-2xl select-none group will-change-[transform,filter]"
+                onContextMenu={(e) => e.preventDefault()}
+                style={{
+                  transformOrigin: "center top",
+                }}
+              >
+                <div className="relative rounded-2xl overflow-hidden">
+                  <Image
+                    src={p.image}
+                    alt={p.label}
+                    width={1600}
+                    height={800}
+                    sizes="(max-width: 640px) 95vw, (max-width: 1024px) 80vw, 768px"
+                    draggable={false}
+                    className="w-full h-auto block pointer-events-none"
+                    style={{ borderRadius: "inherit" }}
+                  />
+                  {/* Smooth top-edge gradient overlay — contained inside overflow:hidden */}
+                  <div
+                    data-card-gradient
+                    className="pointer-events-none absolute inset-x-0 top-0"
+                    style={{
+                      height: "40%",
+                      background:
+                        "linear-gradient(to bottom, rgba(245,240,235,0.95) 0%, rgba(245,240,235,0.7) 20%, rgba(245,240,235,0.35) 50%, rgba(245,240,235,0.1) 75%, transparent 100%)",
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleIncele(`/program/${p.year}yil`)}
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-5 md:right-5 inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide cursor-pointer group/btn"
+                  style={{
+                    backgroundColor: `color-mix(in srgb, ${p.hex} 90%, white)`,
+                    color: "#2C2C2C",
+                    zIndex: 10,
+                    boxShadow: `0 4px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08), 0 0 0 1px ${p.hex}22`,
+                    border: `1px solid ${p.hex}44`,
+                    transition:
+                      "background-color 0.3s ease, box-shadow 0.3s ease",
+                  }}
+                >
+                  İncele
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-transform duration-300 group-hover/btn:translate-x-0.5"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </div>
