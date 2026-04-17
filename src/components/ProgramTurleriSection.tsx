@@ -20,7 +20,6 @@ const STICKY_TOP = 76;
 const STACK_GAP = "clamp(5.25rem, 14vw, 6.75rem)";
 /** Kartlar arasında durgun görünümde hafif aralık (scroll stack matematiğinden ayrı) */
 const STACK_MARGIN = "clamp(0.5rem, 1.25vw, 0.875rem)";
-const STACK_EXIT_BUFFER = "calc(var(--stack-gap) * 0.5)";
 
 const buildRepeatedGap = (count: number) => {
   if (count <= 0) return "0px";
@@ -76,8 +75,6 @@ export default function ProgramTurleriSection({
             {
               "--stack-gap": STACK_GAP,
               "--stack-margin": STACK_MARGIN,
-              "--stack-exit-buffer": STACK_EXIT_BUFFER,
-              paddingBottom: "var(--stack-exit-buffer)",
             } as CSSProperties
           }
         >
@@ -150,6 +147,19 @@ export default function ProgramTurleriSection({
               </div>
             </div>
           ))}
+          {/*
+            Görünmez spacer: sticky sonrası ek scroll. Yükseklik ~önceki yarısı
+            (aspect iki katı “geniş”) → son karttan sonra bir sonraki section’a
+            geçmek için ~%50 daha az kaydırma.
+            Mobil: 32/3 (16/3’ün yarı yüksekliği). sm+: 1600/400 (2:1’in yarısı).
+          */}
+          <div
+            aria-hidden
+            className="w-full pointer-events-none aspect-[32/3] sm:aspect-[1600/400]"
+            style={{
+              marginTop: "var(--stack-margin)",
+            }}
+          />
         </div>
       </div>
     </section>

@@ -692,7 +692,7 @@ export default function ImageCarousel() {
           position: "relative",
           overflow: "hidden",
           background:
-            "radial-gradient(88% 92% at 10% 26%, rgba(252, 243, 231, 0.82) 0%, rgba(252, 243, 231, 0.34) 24%, rgba(252, 243, 231, 0.08) 42%, rgba(252, 243, 231, 0) 66%), radial-gradient(88% 92% at 90% 30%, rgba(229, 197, 167, 0.7) 0%, rgba(229, 197, 167, 0.26) 24%, rgba(229, 197, 167, 0.08) 42%, rgba(229, 197, 167, 0) 68%), radial-gradient(96% 78% at 50% 88%, rgba(213, 171, 137, 0.44) 0%, rgba(213, 171, 137, 0.18) 26%, rgba(213, 171, 137, 0.04) 44%, rgba(213, 171, 137, 0) 70%), linear-gradient(138deg, #f6f0e9 0%, #ecd8c4 22%, #dec0a9 54%, #c99578 100%)",
+            "radial-gradient(70% 62% at 50% 50%, rgba(252, 244, 232, 0.85) 0%, rgba(250, 240, 224, 0.55) 22%, rgba(245, 232, 214, 0.28) 42%, rgba(245, 240, 235, 0.08) 62%, rgba(245, 240, 235, 0) 82%), radial-gradient(58% 46% at 50% 50%, rgba(255, 248, 236, 0.55) 0%, rgba(250, 240, 222, 0.22) 38%, rgba(250, 240, 222, 0) 72%), radial-gradient(120% 80% at 50% 50%, rgba(232, 219, 201, 0.18) 0%, rgba(232, 219, 201, 0.08) 38%, rgba(232, 219, 201, 0) 66%), #F5F0EB",
         }}
       >
           <div className="carousel-ambient" />
@@ -702,7 +702,7 @@ export default function ImageCarousel() {
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(180deg, rgba(250, 249, 246, 0.84) 0%, rgba(250, 249, 246, 0) 16%, rgba(250, 249, 246, 0) 84%, rgba(250, 249, 246, 0.84) 100%)",
+                "linear-gradient(180deg, rgba(245, 240, 235, 1) 0%, rgba(245, 240, 235, 0.7) 6%, rgba(245, 240, 235, 0.25) 14%, rgba(245, 240, 235, 0) 26%, rgba(245, 240, 235, 0) 74%, rgba(245, 240, 235, 0.25) 86%, rgba(245, 240, 235, 0.7) 94%, rgba(245, 240, 235, 1) 100%)",
               zIndex: 0,
               pointerEvents: "none",
             }}
