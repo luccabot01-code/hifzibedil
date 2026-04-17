@@ -42,10 +42,20 @@ const fullscreenMenuRoutes = [
   "/program-bul",
 ];
 
+/** Masaüstünde :hover ile :active çakışmasını ve Link’te hızlı navigasyonu telafi eder */
+const pressFeedbackClass =
+  "!scale-[0.94] !brightness-[0.97] !shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)]";
+
+const PRESS_BURGER = "__navbar_burger__";
+const PRESS_SOCIAL_IG = "__navbar_social_ig__";
+const PRESS_SOCIAL_MAIL = "__navbar_social_mail__";
+const PRESS_SOCIAL_WA = "__navbar_social_wa__";
+
 export default function Navbar() {
   const [openPathname, setOpenPathname] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [burgerHover, setBurgerHover] = useState(false);
+  const [pressedTarget, setPressedTarget] = useState<string | null>(null);
   const pathname = usePathname();
   const isOpen = openPathname === pathname;
   const isFullscreen =
@@ -65,8 +75,6 @@ export default function Navbar() {
   const iconButtonGlassStyle = {
     backgroundImage:
       "linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.14) 100%), radial-gradient(circle at 30% 24%, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.18) 34%, rgba(255,255,255,0) 70%)",
-    boxShadow:
-      "inset 0 1px 0 rgba(255,255,255,0.62), inset 0 -1px 0 rgba(255,255,255,0.12), 0 4px 10px rgba(58,44,30,0.08)",
   } satisfies CSSProperties;
   const panelGlassStyle = {
     backgroundImage:
@@ -95,6 +103,16 @@ export default function Navbar() {
   const closeMenu = () => setOpenPathname(null);
   const toggleMenu = () =>
     setOpenPathname((current) => (current === pathname ? null : pathname));
+  const bindPressHandlers = (id: string) => ({
+    onPointerDown: () => setPressedTarget(id),
+    onPointerUp: () =>
+      setPressedTarget((current) => (current === id ? null : current)),
+    onPointerLeave: () =>
+      setPressedTarget((current) => (current === id ? null : current)),
+    onPointerCancel: () =>
+      setPressedTarget((current) => (current === id ? null : current)),
+  });
+
   const handleMenuItemClick = (
     event: MouseEvent<HTMLAnchorElement>,
     href: string
@@ -108,10 +126,10 @@ export default function Navbar() {
       return;
     }
 
-    closeMenu();
-    // Force scroll to top on navigation
-    window.scrollTo(0, 0);
-    requestAnimationFrame(() => window.scrollTo(0, 0));
+    if (href === pathname) {
+      event.preventDefault();
+      closeMenu();
+    }
   };
 
   return (
@@ -177,11 +195,12 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={toggleMenu}
+                {...bindPressHandlers(PRESS_BURGER)}
                 onMouseEnter={() => {
                   if (window.matchMedia("(hover: hover)").matches) setBurgerHover(true);
                 }}
                 onMouseLeave={() => setBurgerHover(false)}
-                className="relative z-10 flex h-10 w-10 touch-manipulation items-center justify-center overflow-hidden rounded-2xl bg-white/[0.09] transition-[box-shadow,transform] duration-300 ease-out hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-1px_0_rgba(255,255,255,0.16),0_4px_14px_rgba(58,44,30,0.13)] active:scale-[0.94] active:brightness-[0.97] active:shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150"
+                className={`relative z-10 flex h-10 w-10 touch-manipulation items-center justify-center overflow-hidden rounded-2xl bg-white/[0.09] shadow-[inset_0_1px_0_rgba(255,255,255,0.62),inset_0_-1px_0_rgba(255,255,255,0.12),0_4px_10px_rgba(58,44,30,0.08)] transition-[box-shadow,transform,filter] duration-300 ease-out [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-1px_0_rgba(255,255,255,0.16),0_4px_14px_rgba(58,44,30,0.13)] [@media(hover:hover)]:hover:brightness-[1.03] active:!scale-[0.94] active:!brightness-[0.97] active:!shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150 ${pressedTarget === PRESS_BURGER ? pressFeedbackClass : ""}`}
                 style={iconButtonGlassStyle}
                 aria-label="Menü"
                 aria-expanded={isOpen}
@@ -246,10 +265,10 @@ export default function Navbar() {
           onClick={closeMenu}
         />
 
-        {/* Menu Panel */}
+        {/* Menu Panel — z-10: backdrop'un üstünde; touch hedefleri net */}
         <div
           id="site-navigation-drawer"
-          className={`absolute top-0 right-0 h-full overflow-hidden bg-white/[0.045] backdrop-blur-[16px] saturate-[1.18] transform-gpu transition-transform duration-500 ease-out will-change-transform sm:top-4 sm:bottom-4 sm:h-auto sm:rounded-l-[2rem] sm:rounded-r-none ${
+          className={`absolute top-0 right-0 z-10 h-full overflow-hidden bg-white/[0.045] backdrop-blur-[16px] saturate-[1.18] transform-gpu transition-transform duration-500 ease-out will-change-transform sm:top-4 sm:bottom-4 sm:h-auto sm:rounded-l-[2rem] sm:rounded-r-none ${
             isFullscreen ? "w-full sm:w-[26rem]" : "w-1/2 sm:w-[26rem]"
           } ${isOpen ? "translate-x-0" : "translate-x-full"}`}
           style={panelGlassStyle}
@@ -278,24 +297,23 @@ export default function Navbar() {
               }}
             />
           </div>
-          <div className="pt-24 px-6 sm:px-8 h-full flex flex-col">
+          <div className="touch-manipulation pt-24 px-6 sm:px-8 h-full flex flex-col">
             <nav className="relative z-10 flex flex-col gap-3 sm:gap-4">
               {menuItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   scroll={true}
+                  {...bindPressHandlers(item.href)}
                   onClick={(event) => handleMenuItemClick(event, item.href)}
-                  className="group flex items-center gap-3 rounded-2xl bg-white/[0.05] px-4 py-3 text-dark backdrop-blur-[12px] transition-all duration-300 hover:scale-[1.02] hover:bg-white/[0.08] active:scale-[0.97]"
+                  className={`group flex min-h-11 touch-manipulation items-center gap-3 rounded-2xl bg-white/[0.05] px-4 py-3 text-dark shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(255,255,255,0.03)] backdrop-blur-[12px] transition-[transform,box-shadow,background-color,filter] duration-300 ease-out hover:bg-white/[0.08] [@media(hover:hover)]:hover:scale-[1.02] [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(255,255,255,0.05),0_10px_28px_rgba(58,44,30,0.12)] [@media(hover:hover)]:hover:brightness-[1.04] active:!scale-[0.94] active:!brightness-[0.97] active:!shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150 ${pressedTarget === item.href ? pressFeedbackClass : ""}`}
                   style={{
                     backgroundImage:
                       "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.04) 100%)",
-                    boxShadow:
-                      "inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.03)",
                   }}
                 >
                   <item.icon
-                    className="h-[15px] w-[15px] shrink-0 text-[#9a8874] transition-all duration-300 group-hover:scale-110 group-hover:text-[#7f6c58]"
+                    className="h-[15px] w-[15px] shrink-0 text-[#9a8874] transition-all duration-300 [@media(hover:hover)]:group-hover:scale-110 [@media(hover:hover)]:group-hover:text-[#7f6c58]"
                     strokeWidth={1.9}
                     aria-hidden="true"
                   />
@@ -314,12 +332,11 @@ export default function Navbar() {
                 href="https://www.instagram.com/hifzibedil"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/[0.05] text-earth backdrop-blur-[12px] transition-all duration-300 hover:scale-[1.08] hover:bg-white/[0.1]"
+                {...bindPressHandlers(PRESS_SOCIAL_IG)}
+                className={`flex h-11 w-11 touch-manipulation items-center justify-center rounded-full bg-white/[0.05] text-earth shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(255,255,255,0.03)] backdrop-blur-[12px] transition-[transform,box-shadow,background-color,filter] duration-300 ease-out hover:bg-white/[0.1] [@media(hover:hover)]:hover:scale-[1.08] [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(255,255,255,0.05),0_8px_22px_rgba(58,44,30,0.14)] [@media(hover:hover)]:hover:brightness-[1.05] active:!scale-[0.94] active:!brightness-[0.97] active:!shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150 ${pressedTarget === PRESS_SOCIAL_IG ? pressFeedbackClass : ""}`}
                 style={{
                   backgroundImage:
                     "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.04) 100%)",
-                  boxShadow:
-                    "inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.03)",
                 }}
                 aria-label="Instagram"
               >
@@ -327,12 +344,11 @@ export default function Navbar() {
               </a>
               <a
                 href="mailto:info@hifzibedil.com"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/[0.05] text-earth backdrop-blur-[12px] transition-all duration-300 hover:scale-[1.08] hover:bg-white/[0.1]"
+                {...bindPressHandlers(PRESS_SOCIAL_MAIL)}
+                className={`flex h-11 w-11 touch-manipulation items-center justify-center rounded-full bg-white/[0.05] text-earth shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(255,255,255,0.03)] backdrop-blur-[12px] transition-[transform,box-shadow,background-color,filter] duration-300 ease-out hover:bg-white/[0.1] [@media(hover:hover)]:hover:scale-[1.08] [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(255,255,255,0.05),0_8px_22px_rgba(58,44,30,0.14)] [@media(hover:hover)]:hover:brightness-[1.05] active:!scale-[0.94] active:!brightness-[0.97] active:!shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150 ${pressedTarget === PRESS_SOCIAL_MAIL ? pressFeedbackClass : ""}`}
                 style={{
                   backgroundImage:
                     "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.04) 100%)",
-                  boxShadow:
-                    "inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.03)",
                 }}
                 aria-label="E-posta"
               >
@@ -342,12 +358,11 @@ export default function Navbar() {
                 href="https://wa.me/905300202483"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/[0.05] text-earth backdrop-blur-[12px] transition-all duration-300 hover:scale-[1.08] hover:bg-white/[0.1]"
+                {...bindPressHandlers(PRESS_SOCIAL_WA)}
+                className={`flex h-11 w-11 touch-manipulation items-center justify-center rounded-full bg-white/[0.05] text-earth shadow-[inset_0_1px_0_rgba(255,255,255,0.22),inset_0_-1px_0_rgba(255,255,255,0.03)] backdrop-blur-[12px] transition-[transform,box-shadow,background-color,filter] duration-300 ease-out hover:bg-white/[0.1] [@media(hover:hover)]:hover:scale-[1.08] [@media(hover:hover)]:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),inset_0_-1px_0_rgba(255,255,255,0.05),0_8px_22px_rgba(58,44,30,0.14)] [@media(hover:hover)]:hover:brightness-[1.05] active:!scale-[0.94] active:!brightness-[0.97] active:!shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150 ${pressedTarget === PRESS_SOCIAL_WA ? pressFeedbackClass : ""}`}
                 style={{
                   backgroundImage:
                     "linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.04) 100%)",
-                  boxShadow:
-                    "inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(255,255,255,0.03)",
                 }}
                 aria-label="WhatsApp"
               >

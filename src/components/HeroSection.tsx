@@ -163,14 +163,14 @@ export default function HeroSection() {
               <button
                 type="button"
                 onClick={() => scrollToSection("programs")}
-                className="inline-flex flex-1 cursor-pointer items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 bg-[#A7A096] text-ivory rounded-xl text-[13px] sm:text-base font-medium text-center hover:bg-[#958d83] active:scale-95 transition-all duration-200"
+                className="inline-flex flex-1 touch-manipulation cursor-pointer items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 bg-[#A7A096] text-ivory rounded-xl text-[13px] sm:text-base font-medium text-center hover:bg-[#958d83] transition-[transform,box-shadow,background-color] duration-300 ease-out active:scale-[0.94] active:brightness-[0.97] active:shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150"
               >
                 Program Türleri
               </button>
               <button
                 type="button"
                 onClick={() => scrollToSection("program-finder")}
-                className="inline-flex flex-1 cursor-pointer items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 border-2 border-earth/30 text-earth rounded-xl text-[13px] sm:text-base font-medium text-center leading-snug hover:bg-earth/5 active:scale-95 transition-all duration-200"
+                className="inline-flex flex-1 touch-manipulation cursor-pointer items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 border-2 border-earth/30 text-earth rounded-xl text-[13px] sm:text-base font-medium text-center leading-snug hover:bg-earth/5 transition-[transform,box-shadow,background-color] duration-300 ease-out active:scale-[0.94] active:brightness-[0.97] active:shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150"
               >
                 Programımı Bul
               </button>

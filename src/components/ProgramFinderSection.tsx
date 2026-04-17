@@ -32,7 +32,7 @@ export default function ProgramFinderSection() {
             <ScrollReveal delay={400} distance={24} duration={800}>
               <Link
                 href="/program-bul"
-                className="group inline-flex items-center gap-2 px-8 py-4 bg-[#A7A096] text-ivory rounded-xl font-medium text-lg hover:bg-[#958d83] transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="group inline-flex touch-manipulation items-center gap-2 px-8 py-4 bg-[#A7A096] text-ivory rounded-xl font-medium text-lg hover:bg-[#958d83] transition-[transform,box-shadow,background-color] duration-300 ease-out active:scale-[0.94] active:brightness-[0.97] active:shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150 shadow-lg hover:shadow-xl"
               >
                 Programımı Bul
                 <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />

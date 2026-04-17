@@ -18,7 +18,8 @@ const programs = [
 
 const STICKY_TOP = 76;
 const STACK_GAP = "clamp(5.25rem, 14vw, 6.75rem)";
-const STACK_MARGIN = "0px";
+/** Kartlar arasında durgun görünümde hafif aralık (scroll stack matematiğinden ayrı) */
+const STACK_MARGIN = "clamp(0.5rem, 1.25vw, 0.875rem)";
 const STACK_EXIT_BUFFER = "calc(var(--stack-gap) * 0.5)";
 
 const buildRepeatedGap = (count: number) => {
