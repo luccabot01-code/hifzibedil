@@ -45,7 +45,7 @@ export default function ProgramTurleriSection({
   return (
     <section
       id="programs"
-      className="relative scroll-mt-24 bg-transparent pb-4 sm:pb-6"
+      className="relative scroll-mt-24 bg-transparent pb-0"
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal duration={800} distance={32}>
@@ -148,17 +148,12 @@ export default function ProgramTurleriSection({
             </div>
           ))}
           {/*
-            Görünmez spacer: sticky sonrası ek scroll. Yükseklik ~önceki yarısı
-            (aspect iki katı “geniş”) → son karttan sonra bir sonraki section’a
-            geçmek için ~%50 daha az kaydırma.
-            Mobil: 32/3 (16/3’ün yarı yüksekliği). sm+: 1600/400 (2:1’in yarısı).
+            Son kartın marginBottom’u + bu blok = Program Bul ↔ Carousel arası
+            boşlukla aynı: pb-10+pt-10 (5rem) mobil, pb-12+pt-12 (6rem) sm+.
           */}
           <div
             aria-hidden
-            className="w-full pointer-events-none aspect-[32/3] sm:aspect-[1600/400]"
-            style={{
-              marginTop: "var(--stack-margin)",
-            }}
+            className="w-full pointer-events-none shrink-0 h-[calc(5rem-var(--stack-margin))] sm:h-[calc(6rem-var(--stack-margin))]"
           />
         </div>
       </div>
