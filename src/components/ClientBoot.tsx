@@ -1,6 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
+import { usePathname } from "next/navigation";
+import { SCROLL_TO_PROGRAMS_STORAGE_KEY } from "@/lib/home-navigation";
+
+function scrollDocumentTop() {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
+function scrollToProgramsSection() {
+  document.getElementById("programs")?.scrollIntoView({
+    block: "start",
+    behavior: "auto",
+  });
+}
 
 export default function ClientBoot() {
   useEffect(() => {
@@ -12,108 +27,89 @@ export default function ClientBoot() {
     };
 
     document.addEventListener("contextmenu", preventImageContextMenu, true);
+    return () =>
+      document.removeEventListener("contextmenu", preventImageContextMenu, true);
+  }, []);
 
-    if (window.location.pathname !== "/") {
-      return () => {
-        document.removeEventListener("contextmenu", preventImageContextMenu, true);
-      };
+  const pathname = usePathname();
+
+  useLayoutEffect(() => {
+    if (pathname !== "/") {
+      return;
     }
 
-    const navigationEntry = window.performance?.getEntriesByType?.("navigation")?.[0] as
-      | PerformanceNavigationTiming
-      | undefined;
+    const prevRestoration = history.scrollRestoration;
+    history.scrollRestoration = "manual";
 
-    const getNavigationType = () => {
-      if (navigationEntry && "type" in navigationEntry) {
-        return navigationEntry.type;
-      }
-
-      const legacyNavigation = window.performance?.navigation;
-
-      if (!legacyNavigation) {
-        return "navigate";
-      }
-
-      if (legacyNavigation.type === 1) {
-        return "reload";
-      }
-
-      if (legacyNavigation.type === 2) {
-        return "back_forward";
-      }
-
-      return "navigate";
-    };
-
-    if (getNavigationType() !== "reload") {
-      return () => {
-        document.removeEventListener("contextmenu", preventImageContextMenu, true);
-      };
-    }
-
-    const previousScrollRestoration = window.history.scrollRestoration;
-
-    const clearHash = () => {
-      if (!window.location.hash) {
-        return;
-      }
-
+    if (window.location.hash) {
       window.history.replaceState(
         window.history.state,
         "",
         window.location.pathname + window.location.search
       );
+    }
+
+    let goPrograms = false;
+    try {
+      if (sessionStorage.getItem(SCROLL_TO_PROGRAMS_STORAGE_KEY) === "1") {
+        sessionStorage.removeItem(SCROLL_TO_PROGRAMS_STORAGE_KEY);
+        goPrograms = true;
+      }
+    } catch {
+      /* private mode */
+    }
+
+    if (goPrograms) {
+      scrollToProgramsSection();
+      const t0 = window.setTimeout(scrollToProgramsSection, 0);
+      const t1 = window.setTimeout(scrollToProgramsSection, 50);
+      const t2 = window.setTimeout(scrollToProgramsSection, 150);
+      const raf = requestAnimationFrame(() => {
+        scrollToProgramsSection();
+        requestAnimationFrame(scrollToProgramsSection);
+      });
+
+      const onPageShow = () => scrollToProgramsSection();
+      const onLoad = () => scrollToProgramsSection();
+      window.addEventListener("pageshow", onPageShow);
+      window.addEventListener("load", onLoad);
+
+      return () => {
+        window.removeEventListener("pageshow", onPageShow);
+        window.removeEventListener("load", onLoad);
+        window.clearTimeout(t0);
+        window.clearTimeout(t1);
+        window.clearTimeout(t2);
+        cancelAnimationFrame(raf);
+        history.scrollRestoration = prevRestoration;
+      };
+    }
+
+    scrollDocumentTop();
+
+    const onPageShow = (e: PageTransitionEvent) => {
+      scrollDocumentTop();
+      if (e.persisted) {
+        requestAnimationFrame(() => scrollDocumentTop());
+      }
     };
 
-    const resetScroll = () => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    };
+    const onLoad = () => scrollDocumentTop();
 
-    const restoreScrollBehavior = () => {
-      window.history.scrollRestoration = previousScrollRestoration || "auto";
-    };
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("load", onLoad);
 
-    const handlePageShow = () => {
-      resetScroll();
-      window.setTimeout(() => {
-        resetScroll();
-        restoreScrollBehavior();
-      }, 150);
-    };
-
-    const handleLoad = () => {
-      resetScroll();
-      window.setTimeout(() => {
-        resetScroll();
-        restoreScrollBehavior();
-      }, 150);
-    };
-
-    window.history.scrollRestoration = "manual";
-    clearHash();
-    resetScroll();
-
-    const timerA = window.setTimeout(resetScroll, 0);
-    const timerB = window.setTimeout(resetScroll, 150);
-    const rafId = window.requestAnimationFrame(() => {
-      resetScroll();
-    });
-
-    window.addEventListener("pageshow", handlePageShow, { once: true });
-    window.addEventListener("load", handleLoad, { once: true });
+    const t0 = window.setTimeout(scrollDocumentTop, 0);
+    const t1 = window.setTimeout(scrollDocumentTop, 100);
 
     return () => {
-      document.removeEventListener("contextmenu", preventImageContextMenu, true);
-      window.cancelAnimationFrame(rafId);
-      window.clearTimeout(timerA);
-      window.clearTimeout(timerB);
-      window.removeEventListener("pageshow", handlePageShow);
-      window.removeEventListener("load", handleLoad);
-      restoreScrollBehavior();
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("load", onLoad);
+      window.clearTimeout(t0);
+      window.clearTimeout(t1);
+      history.scrollRestoration = prevRestoration;
     };
-  }, []);
+  }, [pathname]);
 
   return null;
 }

@@ -15,6 +15,13 @@ export default function HeroSection() {
     return () => clearTimeout(t);
   }, []);
 
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   useEffect(() => {
     const el = logoRef.current;
     if (!el) return;
@@ -153,18 +160,20 @@ export default function HeroSection() {
                 loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}
             >
-              <a
-                href="#programs"
-                className="inline-flex flex-1 items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 bg-[#A7A096] text-ivory rounded-xl text-[13px] sm:text-base font-medium text-center hover:bg-[#958d83] active:scale-95 transition-all duration-200"
+              <button
+                type="button"
+                onClick={() => scrollToSection("programs")}
+                className="inline-flex flex-1 cursor-pointer items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 bg-[#A7A096] text-ivory rounded-xl text-[13px] sm:text-base font-medium text-center hover:bg-[#958d83] active:scale-95 transition-all duration-200"
               >
                 Program Türleri
-              </a>
-              <a
-                href="/program-bul"
-                className="inline-flex flex-1 items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 border-2 border-earth/30 text-earth rounded-xl text-[13px] sm:text-base font-medium text-center leading-snug hover:bg-earth/5 active:scale-95 transition-all duration-200"
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection("program-finder")}
+                className="inline-flex flex-1 cursor-pointer items-center justify-center px-2.5 sm:px-5 py-2 sm:py-3 border-2 border-earth/30 text-earth rounded-xl text-[13px] sm:text-base font-medium text-center leading-snug hover:bg-earth/5 active:scale-95 transition-all duration-200"
               >
                 Programımı Bul
-              </a>
+              </button>
             </div>
           </div>
 

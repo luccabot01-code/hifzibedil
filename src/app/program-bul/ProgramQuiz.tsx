@@ -218,6 +218,21 @@ function WhatsAppButton({ text }: { text: string }) {
   );
 }
 
+const PROGRAM_NAME_HIGHLIGHT_REGEX =
+  /(Hıfz-ı Bedîl (?:1 Yıllık Has Program(?:ı|ını)?|2 Yıllık Program(?:ı|ını)?|4 Yıllık Program(?:ı|ını)?|6 Yıllık Program(?:ı|ını)?))/g;
+
+function renderHighlightedProgramNames(text: string) {
+  return text.split(PROGRAM_NAME_HIGHLIGHT_REGEX).map((part, index) =>
+    index % 2 === 1 ? (
+      <span key={`${part}-${index}`} className="font-semibold text-dark">
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  );
+}
+
 // ─── Body text block ────────────────────────────────────────────────
 // Splits a long body string into readable paragraphs (~2–3 sentences each)
 function BodyTextBlock({ text }: { text: string }) {
@@ -231,7 +246,7 @@ function BodyTextBlock({ text }: { text: string }) {
     <div className="relative bg-ivory rounded-2xl p-6 sm:p-8 border border-sand/60 shadow-sm overflow-hidden mb-8">
       <div className="relative z-10 space-y-4 text-dark/80 text-[14px] sm:text-[15px] leading-[1.8]">
         {paragraphs.map((p, i) => (
-          <p key={i}>{p}</p>
+          <p key={i}>{renderHighlightedProgramNames(p)}</p>
         ))}
       </div>
     </div>

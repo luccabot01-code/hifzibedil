@@ -181,7 +181,7 @@ export default function Navbar() {
                   if (window.matchMedia("(hover: hover)").matches) setBurgerHover(true);
                 }}
                 onMouseLeave={() => setBurgerHover(false)}
-                className="relative z-10 flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-white/[0.09] transition-[box-shadow] duration-300 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-1px_0_rgba(255,255,255,0.16),0_4px_14px_rgba(58,44,30,0.13)]"
+                className="relative z-10 flex h-10 w-10 touch-manipulation items-center justify-center overflow-hidden rounded-2xl bg-white/[0.09] transition-[box-shadow,transform] duration-300 ease-out hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-1px_0_rgba(255,255,255,0.16),0_4px_14px_rgba(58,44,30,0.13)] active:scale-[0.94] active:brightness-[0.97] active:shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150"
                 style={iconButtonGlassStyle}
                 aria-label="Menü"
                 aria-expanded={isOpen}

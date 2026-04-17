@@ -43,6 +43,12 @@ export default function ImageCarousel() {
   const mix = (from: number, to: number, progress: number) =>
     from + (to - from) * progress;
 
+  /** Smooth0→1 easing for blur only (keeps endpoints; softer than linear). */
+  const smoothBlurT = (t: number) => {
+    const x = Math.min(Math.max(t, 0), 1);
+    return x * x * (3 - 2 * x);
+  };
+
   const getCssNumber = (styles: CSSStyleDeclaration, propertyName: string) => {
     const value = Number.parseFloat(styles.getPropertyValue(propertyName));
     return Number.isFinite(value) ? value : 0;
@@ -110,18 +116,18 @@ export default function ImageCarousel() {
       let opacity: number;
 
       if (absoluteProgress <= 1) {
-        blur = mix(0, nearBlur, absoluteProgress);
+        blur = mix(0, nearBlur, smoothBlurT(absoluteProgress));
         scale = mix(activeScale, nearScale, absoluteProgress);
         opacity = mix(1, nearOpacity, absoluteProgress);
       } else {
         const outerProgress = absoluteProgress - 1;
-        blur = mix(nearBlur, inactiveBlur, outerProgress);
+        blur = mix(nearBlur, inactiveBlur, smoothBlurT(outerProgress));
         scale = mix(nearScale, inactiveScale, outerProgress);
         opacity = mix(nearOpacity, inactiveOpacity, outerProgress);
       }
 
-      // Round to reduce style recalcs for tiny changes
-      const blurR = Math.round(blur * 100) / 100;
+      // Round to reduce style recalcs for tiny changes (extra precision for blur ramps)
+      const blurR = Math.round(blur * 1000) / 1000;
       const scaleR = Math.round(scale * 1000) / 1000;
       const opacityR = Math.round(opacity * 1000) / 1000;
 
@@ -202,9 +208,9 @@ export default function ImageCarousel() {
       className={`image-carousel py-10 sm:py-12${isNearViewport ? " is-near-viewport" : ""}${hasRevealed ? " cards-revealed" : ""}`}
       style={{
         maskImage:
-          "linear-gradient(to bottom, transparent 0%, black 15%, black 94%, transparent 100%)",
+          "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
         WebkitMaskImage:
-          "linear-gradient(to bottom, transparent 0%, black 15%, black 94%, transparent 100%)",
+          "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
       }}
     >
       <style
@@ -213,7 +219,7 @@ export default function ImageCarousel() {
             .image-carousel {
               --carousel-slide-width: clamp(228px, 72vw, 276px);
               --carousel-panel-padding-y: clamp(42px, 10vw, 56px);
-              --carousel-panel-radius: 20px;
+              --carousel-panel-radius: 0px;
               --carousel-stage-padding-x: 6px;
               --carousel-card-radius: 18px;
               --inactive-scale: 0.86;
@@ -271,9 +277,9 @@ export default function ImageCarousel() {
               z-index: 0;
               pointer-events: none;
               background:
-                radial-gradient(42% 40% at 16% 34%, rgba(249, 238, 223, 0.28) 0%, rgba(249, 238, 223, 0.16) 22%, rgba(249, 238, 223, 0.04) 42%, rgba(249, 238, 223, 0) 68%),
-                radial-gradient(34% 34% at 82% 44%, rgba(225, 191, 159, 0.18) 0%, rgba(225, 191, 159, 0.08) 24%, rgba(225, 191, 159, 0.02) 44%, rgba(225, 191, 159, 0) 66%),
-                radial-gradient(46% 42% at 30% 82%, rgba(214, 171, 137, 0.14) 0%, rgba(214, 171, 137, 0.06) 26%, rgba(214, 171, 137, 0.02) 42%, rgba(214, 171, 137, 0) 66%);
+                radial-gradient(58% 52% at 8% 32%, rgba(249, 238, 223, 0.28) 0%, rgba(249, 238, 223, 0.16) 24%, rgba(249, 238, 223, 0.04) 46%, rgba(249, 238, 223, 0) 72%),
+                radial-gradient(58% 52% at 92% 40%, rgba(225, 191, 159, 0.18) 0%, rgba(225, 191, 159, 0.08) 26%, rgba(225, 191, 159, 0.02) 46%, rgba(225, 191, 159, 0) 72%),
+                radial-gradient(72% 48% at 50% 86%, rgba(214, 171, 137, 0.14) 0%, rgba(214, 171, 137, 0.06) 28%, rgba(214, 171, 137, 0.02) 46%, rgba(214, 171, 137, 0) 72%);
               opacity: 0.42;
               transform: translateZ(0);
             }
@@ -321,10 +327,11 @@ export default function ImageCarousel() {
               );
             }
 
+            /* Full bleed veil; below .carousel-stage (z-index 2) so cards sit on top. */
             .image-carousel .carousel-edge-fade {
               position: absolute;
               inset: 0;
-              z-index: 3;
+              z-index: 1;
               pointer-events: none;
               background: linear-gradient(
                 180deg,
@@ -332,10 +339,10 @@ export default function ImageCarousel() {
                 rgba(246, 240, 233, 0.84) 8%,
                 rgba(246, 240, 233, 0.2) 16%,
                 rgba(246, 240, 233, 0) 24%,
-                rgba(246, 240, 233, 0) 84%,
-                rgba(226, 208, 191, 0.18) 90%,
-                rgba(226, 208, 191, 0.74) 96%,
-                rgba(226, 208, 191, 0.96) 100%
+                rgba(246, 240, 233, 0) 76%,
+                rgba(246, 240, 233, 0.2) 84%,
+                rgba(246, 240, 233, 0.84) 92%,
+                rgba(246, 240, 233, 0.98) 100%
               );
             }
 
@@ -384,9 +391,10 @@ export default function ImageCarousel() {
 
             /* === INACTIVE cards (all slides by default) === */
             .image-carousel .swiper-slide .carousel-card {
-              transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                          opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-                          box-shadow 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+              transition: transform 0.55s cubic-bezier(0.28, 0.72, 0.36, 1),
+                          opacity 0.55s cubic-bezier(0.28, 0.72, 0.36, 1),
+                          filter 1.05s cubic-bezier(0.18, 0.88, 0.32, 1),
+                          box-shadow 0.55s cubic-bezier(0.28, 0.72, 0.36, 1);
               filter: blur(var(--card-blur-live));
               opacity: var(--card-opacity-live);
               transform: translate3d(0,0,0) scale(var(--card-scale-live));
@@ -400,7 +408,7 @@ export default function ImageCarousel() {
             .image-carousel .swiper-slide-prev .carousel-card,
             .image-carousel .swiper-slide-next .carousel-card,
             .image-carousel .swiper-slide-active .carousel-card {
-              will-change: transform, opacity;
+              will-change: transform, opacity, filter;
             }
 
             .image-carousel .carousel-card::before {
@@ -476,9 +484,10 @@ export default function ImageCarousel() {
 
               .image-carousel .swiper-slide .carousel-card {
                 transition:
-                  transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                  opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-                  box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+                  transform 0.5s cubic-bezier(0.28, 0.72, 0.36, 1),
+                  opacity 0.5s cubic-bezier(0.28, 0.72, 0.36, 1),
+                  filter 0.95s cubic-bezier(0.18, 0.88, 0.32, 1),
+                  box-shadow 0.5s cubic-bezier(0.28, 0.72, 0.36, 1);
               }
 
               .image-carousel .swiper-slide-active .carousel-card {
@@ -509,7 +518,7 @@ export default function ImageCarousel() {
               .image-carousel {
                 --carousel-slide-width: clamp(250px, 38vw, 304px);
                 --carousel-panel-padding-y: 72px;
-                --carousel-panel-radius: 24px;
+                --carousel-panel-radius: 0px;
                 --carousel-stage-padding-x: 12px;
                 --carousel-card-radius: 20px;
                 --inactive-scale: 0.8;
@@ -523,9 +532,10 @@ export default function ImageCarousel() {
               }
 
               .image-carousel .swiper-slide .carousel-card {
-                transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                            opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-                            box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+                transition: transform 0.6s cubic-bezier(0.28, 0.72, 0.36, 1),
+                            opacity 0.6s cubic-bezier(0.28, 0.72, 0.36, 1),
+                            filter 1.12s cubic-bezier(0.18, 0.88, 0.32, 1),
+                            box-shadow 0.6s cubic-bezier(0.28, 0.72, 0.36, 1);
               }
 
               .image-carousel .carousel-backdrop-art {
@@ -562,8 +572,8 @@ export default function ImageCarousel() {
               }
 
               .image-carousel .carousel-backdrop-art-image {
-                width: min(122%, 1480px);
-                height: min(112%, 840px);
+                width: min(160%, 2200px);
+                height: min(118%, 920px);
               }
 
               .image-carousel .carousel-backdrop-art-image::after {
@@ -676,16 +686,15 @@ export default function ImageCarousel() {
         }}
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div
-          className="carousel-panel"
-          style={{
-            position: "relative",
-            overflow: "hidden",
-            background:
-              "radial-gradient(58% 72% at 14% 24%, rgba(252, 243, 231, 0.82) 0%, rgba(252, 243, 231, 0.34) 22%, rgba(252, 243, 231, 0.08) 38%, rgba(252, 243, 231, 0) 58%), radial-gradient(46% 58% at 86% 30%, rgba(229, 197, 167, 0.7) 0%, rgba(229, 197, 167, 0.26) 22%, rgba(229, 197, 167, 0.08) 38%, rgba(229, 197, 167, 0) 60%), radial-gradient(52% 62% at 36% 86%, rgba(213, 171, 137, 0.44) 0%, rgba(213, 171, 137, 0.18) 24%, rgba(213, 171, 137, 0.04) 40%, rgba(213, 171, 137, 0) 62%), linear-gradient(138deg, #f6f0e9 0%, #ecd8c4 22%, #dec0a9 54%, #c99578 100%)",
-          }}
-        >
+      <div
+        className="carousel-panel w-full"
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          background:
+            "radial-gradient(88% 92% at 10% 26%, rgba(252, 243, 231, 0.82) 0%, rgba(252, 243, 231, 0.34) 24%, rgba(252, 243, 231, 0.08) 42%, rgba(252, 243, 231, 0) 66%), radial-gradient(88% 92% at 90% 30%, rgba(229, 197, 167, 0.7) 0%, rgba(229, 197, 167, 0.26) 24%, rgba(229, 197, 167, 0.08) 42%, rgba(229, 197, 167, 0) 68%), radial-gradient(96% 78% at 50% 88%, rgba(213, 171, 137, 0.44) 0%, rgba(213, 171, 137, 0.18) 26%, rgba(213, 171, 137, 0.04) 44%, rgba(213, 171, 137, 0) 70%), linear-gradient(138deg, #f6f0e9 0%, #ecd8c4 22%, #dec0a9 54%, #c99578 100%)",
+        }}
+      >
           <div className="carousel-ambient" />
 
           <div
@@ -693,7 +702,7 @@ export default function ImageCarousel() {
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(180deg, rgba(250, 249, 246, 0.84) 0%, rgba(250, 249, 246, 0) 16%, rgba(245, 240, 235, 0.02) 78%, rgba(232, 223, 213, 0.08) 92%, rgba(232, 223, 213, 0.16) 100%)",
+                "linear-gradient(180deg, rgba(250, 249, 246, 0.84) 0%, rgba(250, 249, 246, 0) 16%, rgba(250, 249, 246, 0) 84%, rgba(250, 249, 246, 0.84) 100%)",
               zIndex: 0,
               pointerEvents: "none",
             }}
@@ -712,8 +721,6 @@ export default function ImageCarousel() {
             }}
           />
 
-          <div className="carousel-edge-fade" />
-
           <div className="carousel-backdrop-art">
             <div className="carousel-backdrop-art-image">
               <Image
@@ -727,15 +734,18 @@ export default function ImageCarousel() {
             </div>
           </div>
 
-          <div
-            className="carousel-stage"
-            style={{
-              position: "relative",
-              zIndex: 2,
-              width: "100%",
-            }}
-          >
-            <Swiper
+          <div className="carousel-edge-fade" />
+
+          <div className="relative z-[2] w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+              className="carousel-stage"
+              style={{
+                position: "relative",
+                zIndex: 2,
+                width: "100%",
+              }}
+            >
+              <Swiper
               modules={[EffectCoverflow]}
               effect="coverflow"
               onSwiper={(swiper) => {
@@ -770,8 +780,8 @@ export default function ImageCarousel() {
               resistanceRatio={0.76}
               threshold={2}
               longSwipesRatio={0.28}
-              longSwipesMs={220}
-              speed={380}
+              longSwipesMs={280}
+              speed={620}
               spaceBetween={10}
               coverflowEffect={{
                 rotate: 0,
@@ -783,7 +793,7 @@ export default function ImageCarousel() {
               }}
               breakpoints={{
                 640: {
-                  speed: 420,
+                  speed: 680,
                   spaceBetween: 14,
                   coverflowEffect: {
                     rotate: 0,
@@ -795,7 +805,7 @@ export default function ImageCarousel() {
                   },
                 },
                 768: {
-                  speed: 480,
+                  speed: 760,
                   spaceBetween: 18,
                   coverflowEffect: {
                     rotate: 0,
@@ -807,7 +817,7 @@ export default function ImageCarousel() {
                   },
                 },
                 1024: {
-                  speed: 550,
+                  speed: 840,
                   spaceBetween: 28,
                   coverflowEffect: {
                     rotate: 0,

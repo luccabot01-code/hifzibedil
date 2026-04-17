@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -17,9 +17,9 @@ const programs = [
 ];
 
 const STICKY_TOP = 76;
-const STACK_GAP = "clamp(4.5rem, 13vw, 5.25rem)";
-const STACK_MARGIN = "clamp(4.75rem, 14vw, 5.5rem)";
-const STACK_EXIT_BUFFER = "calc(var(--stack-margin) * 0.5)";
+const STACK_GAP = "clamp(5.25rem, 14vw, 6.75rem)";
+const STACK_MARGIN = "0px";
+const STACK_EXIT_BUFFER = "calc(var(--stack-gap) * 0.5)";
 
 const buildRepeatedGap = (count: number) => {
   if (count <= 0) return "0px";
@@ -37,68 +37,16 @@ export default function ProgramTurleriSection({
   showSubtitle = true,
 }: ProgramTurleriSectionProps) {
   const Heading = headingLevel;
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleIncele = (href: string) => {
     window.location.href = href;
   };
 
-  /* Animate scale + brightness based on cumulative depth (how many cards sit on top) */
-  const onScroll = useCallback(() => {
-    const cards = cardsRef.current;
-    const total = cards.length;
-
-    /* Step 1 — calculate per-pair overlap progress (0 → 1) */
-    const overlaps: number[] = [];
-    for (let i = 0; i < total - 1; i++) {
-      const card = cards[i];
-      const nextCard = cards[i + 1];
-      if (!card || !nextCard) { overlaps.push(0); continue; }
-
-      const cardRect = card.getBoundingClientRect();
-      const nextRect = nextCard.getBoundingClientRect();
-      const overlap = cardRect.top + cardRect.height - nextRect.top;
-      const maxOverlap = cardRect.height;
-      const raw = overlap > 0 ? Math.min(overlap / maxOverlap, 1) : 0;
-      overlaps.push(1 - Math.pow(1 - raw, 2)); // ease-out
-    }
-
-    /* Step 2 — apply cumulative depth-based styling */
-    for (let i = 0; i < total - 1; i++) {
-      const inner = cards[i]?.querySelector<HTMLElement>("[data-card-inner]");
-      if (!inner) continue;
-
-      const gradient = inner.querySelector<HTMLElement>("[data-card-gradient]");
-
-      /* depth = sum of all overlap progresses from this card onwards */
-      let depth = 0;
-      for (let j = i; j < total - 1; j++) depth += overlaps[j];
-
-      if (depth > 0) {
-        const scale = 1 - depth * 0.055;
-        const brightness = 1 - depth * 0.07;
-        inner.style.transform = `scale(${Math.max(scale, 0.78)})`;
-        inner.style.opacity = "1";
-        inner.style.filter = `brightness(${Math.max(brightness, 0.65)})`;
-        /* Fade gradient progressively — fully gone when depth reaches max (3) */
-        if (gradient) gradient.style.opacity = `${Math.max(1 - depth * 0.35, 0)}`;
-      } else {
-        inner.style.transform = "scale(1)";
-        inner.style.opacity = "1";
-        inner.style.filter = "brightness(1)";
-        if (gradient) gradient.style.opacity = "1";
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [onScroll]);
-
   return (
-    <section id="programs" className="relative bg-transparent pb-4 sm:pb-6">
+    <section
+      id="programs"
+      className="relative scroll-mt-24 bg-transparent pb-4 sm:pb-6"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal duration={800} distance={32}>
           <div className="relative z-20 max-w-3xl mx-auto text-center mb-12">
@@ -135,9 +83,6 @@ export default function ProgramTurleriSection({
           {programs.map((p, i) => (
             <div
               key={p.year}
-              ref={(el) => {
-                cardsRef.current[i] = el;
-              }}
               className="sticky"
               style={{
                 top: buildStickyTop(i),
@@ -147,11 +92,8 @@ export default function ProgramTurleriSection({
             >
               <div
                 data-card-inner
-                className="relative rounded-2xl select-none group will-change-[transform,filter]"
+                className="relative rounded-2xl select-none group"
                 onContextMenu={(e) => e.preventDefault()}
-                style={{
-                  transformOrigin: "center top",
-                }}
               >
                 <div className="relative rounded-2xl overflow-hidden">
                   <Image
@@ -178,15 +120,13 @@ export default function ProgramTurleriSection({
                 <button
                   type="button"
                   onClick={() => handleIncele(`/program/${p.year}yil`)}
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-5 md:right-5 inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide cursor-pointer group/btn"
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-5 md:right-5 inline-flex touch-manipulation items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium tracking-wide cursor-pointer group/btn transition-[transform,box-shadow,background-color] duration-300 ease-out active:scale-[0.94] active:brightness-[0.97] active:shadow-[inset_0_2px_8px_rgba(58,44,30,0.12)] active:duration-150"
                   style={{
                     backgroundColor: `color-mix(in srgb, ${p.hex} 90%, white)`,
                     color: "#2C2C2C",
                     zIndex: 10,
                     boxShadow: `0 4px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08), 0 0 0 1px ${p.hex}22`,
                     border: `1px solid ${p.hex}44`,
-                    transition:
-                      "background-color 0.3s ease, box-shadow 0.3s ease",
                   }}
                 >
                   İncele

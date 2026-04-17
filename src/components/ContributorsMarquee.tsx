@@ -5,7 +5,7 @@ import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 
 const contributors = [
-  { src: "/yeniklasor/darusselam.png", alt: "Darüsselam", className: "h-10 sm:h-12" },
+  { src: "/yeniklasor/darusselam.png", alt: "Darüsselam", className: "h-12 sm:h-[3.75rem]" },
   { src: "/yeniklasor/fatihbelediyesi.png", alt: "Fatih Belediyesi", className: "h-12 sm:h-16" },
   { src: "/yeniklasor/onenuqta.png", alt: "One Nuqta", className: "h-12 sm:h-16" },
   { src: "/yeniklasor/istanbul-kutu-logo-siyah.png", alt: "İstanbul Kutu", className: "h-4 sm:h-6" },
@@ -86,7 +86,7 @@ export default function ContributorsMarquee() {
       onContextMenu={(e) => e.preventDefault()}
     >
       <ScrollReveal direction="none" duration={1000}>
-        <div className="flex h-14 items-center overflow-hidden sm:h-[4.25rem]">
+        <div className="flex h-16 items-center overflow-hidden sm:h-20">
           <div
             ref={trackRef}
             className="flex w-max will-change-transform"
