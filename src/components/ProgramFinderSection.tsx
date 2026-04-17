@@ -4,7 +4,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 
 export default function ProgramFinderSection() {
   return (
-    <section id="program-finder" className="scroll-mt-24 py-10 sm:py-12">
+    <section id="program-finder" className="scroll-mt-24 pt-0 pb-10 sm:pt-0 sm:pb-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal duration={800} distance={32}>
           <div className="relative bg-gradient-to-br from-earth/5 to-sand/40 rounded-3xl p-10 sm:p-14 border border-sand/50 text-center overflow-hidden">

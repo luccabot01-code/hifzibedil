@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, type CSSProperties } from "react";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -13,12 +13,24 @@ const programs = [
   { year: "6", label: "6 Yıllık Program", image: "/yeniklasor/6yillik.png", hex: "#CDCBB7" },
   { year: "4", label: "4 Yıllık Program", image: "/yeniklasor/4yillik.png", hex: "#D9BCB4" },
   { year: "2", label: "2 Yıllık Program", image: "/yeniklasor/2yillik.png", hex: "#C1D2D2" },
-  { year: "1", label: "1 Yıllık Program", image: "/yeniklasor/1yillik.png", hex: "#E8CCB2" },
+  { year: "1", label: "1 Yıllık Has Programı", image: "/yeniklasor/1yillik.png", hex: "#E8CCB2" },
 ];
 
-/* Navbar clearance + per-card offset so peeking edges stay visible */
 const STICKY_TOP = 76;
-const STACK_GAP = 18;
+const STACK_GAP = "clamp(4.5rem, 13vw, 5.25rem)";
+const STACK_MARGIN = "clamp(4.75rem, 14vw, 5.5rem)";
+const STACK_EXIT_BUFFER = "calc(var(--stack-margin) * 0.5)";
+
+const buildRepeatedGap = (count: number) => {
+  if (count <= 0) return "0px";
+  if (count === 1) return "var(--stack-gap)";
+  return `calc(${Array.from({ length: count }, () => "var(--stack-gap)").join(" + ")})`;
+};
+
+const buildStickyTop = (index: number) => {
+  if (index === 0) return `${STICKY_TOP}px`;
+  return `calc(${STICKY_TOP}px + ${buildRepeatedGap(index)})`;
+};
 
 export default function ProgramTurleriSection({
   headingLevel = "h2",
@@ -86,7 +98,7 @@ export default function ProgramTurleriSection({
   }, [onScroll]);
 
   return (
-    <section id="programs" className="relative bg-transparent pb-10 sm:pb-12">
+    <section id="programs" className="relative bg-transparent pb-4 sm:pb-6">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <ScrollReveal duration={800} distance={32}>
           <div className="relative z-20 max-w-3xl mx-auto text-center mb-12">
@@ -109,7 +121,17 @@ export default function ProgramTurleriSection({
         </ScrollReveal>
 
         {/* Sticky stacking cards */}
-        <div className="max-w-5xl mx-auto">
+        <div
+          className="max-w-5xl mx-auto"
+          style={
+            {
+              "--stack-gap": STACK_GAP,
+              "--stack-margin": STACK_MARGIN,
+              "--stack-exit-buffer": STACK_EXIT_BUFFER,
+              paddingBottom: "var(--stack-exit-buffer)",
+            } as CSSProperties
+          }
+        >
           {programs.map((p, i) => (
             <div
               key={p.year}
@@ -118,9 +140,9 @@ export default function ProgramTurleriSection({
               }}
               className="sticky"
               style={{
-                top: `${STICKY_TOP + i * STACK_GAP}px`,
+                top: buildStickyTop(i),
                 zIndex: i + 1,
-                marginBottom: i < programs.length - 1 ? 20 : 0,
+                marginBottom: "var(--stack-margin)",
               }}
             >
               <div

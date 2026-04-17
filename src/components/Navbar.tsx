@@ -233,13 +233,14 @@ export default function Navbar() {
 
       {/* Mobile Menu Overlay */}
       <div
-        className={`fixed inset-0 z-40 transition-all duration-500 ${
-          isOpen ? "visible" : "invisible"
+        className={`fixed inset-0 z-40 ${
+          isOpen ? "pointer-events-auto" : "pointer-events-none"
         }`}
+        aria-hidden={!isOpen}
       >
         {/* Backdrop */}
         <div
-          className={`absolute inset-0 bg-[rgba(37,30,24,0.22)] backdrop-blur-md transition-opacity duration-500 ${
+          className={`absolute inset-0 bg-[rgba(37,30,24,0.22)] backdrop-blur-md transition-opacity duration-500 will-change-opacity ${
             isOpen ? "opacity-100" : "opacity-0"
           }`}
           onClick={closeMenu}
@@ -248,10 +249,11 @@ export default function Navbar() {
         {/* Menu Panel */}
         <div
           id="site-navigation-drawer"
-          className={`absolute top-0 right-0 h-full overflow-hidden bg-white/[0.045] backdrop-blur-[16px] saturate-[1.18] transition-all duration-500 ease-out sm:top-4 sm:bottom-4 sm:h-auto sm:rounded-l-[2rem] sm:rounded-r-none ${
+          className={`absolute top-0 right-0 h-full overflow-hidden bg-white/[0.045] backdrop-blur-[16px] saturate-[1.18] transform-gpu transition-transform duration-500 ease-out will-change-transform sm:top-4 sm:bottom-4 sm:h-auto sm:rounded-l-[2rem] sm:rounded-r-none ${
             isFullscreen ? "w-full sm:w-[26rem]" : "w-1/2 sm:w-[26rem]"
           } ${isOpen ? "translate-x-0" : "translate-x-full"}`}
           style={panelGlassStyle}
+          aria-hidden={!isOpen}
         >
           <div className="pointer-events-none absolute inset-0">
             <div
